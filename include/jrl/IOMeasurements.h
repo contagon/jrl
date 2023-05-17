@@ -52,7 +52,7 @@ template <typename T>
 gtsam::NonlinearFactor::shared_ptr parsePrior(std::function<T(json)> val_parser_fn, json input_json) {
   // Get all required fields
   json key_json = input_json["key"];
-  json measurement_json = input_json["prior"];
+  json measurement_json = input_json["measurement"];
   json covariance_json = input_json["covariance"];
 
   // Construct the factor
@@ -74,7 +74,7 @@ json serializePrior(std::function<json(T)> val_serializer_fn, std::string type_t
 
   output["type"] = type_tag;
   output["key"] = prior->key();
-  output["prior"] = val_serializer_fn(prior->prior());
+  output["measurement"] = val_serializer_fn(prior->prior());
 
   output["covariance"] = serializeCovariance(noise_model->covariance());
   return output;

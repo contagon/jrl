@@ -1,4 +1,5 @@
 #pragma once
+#include <random>
 #include <gtsam/nonlinear/Values.h>
 
 #include <nlohmann/json.hpp>
@@ -40,7 +41,7 @@ class Parser {
    *  @param measurements_json Input JSON containing the serialized measurement entries
    *  @return Parsed measurement entries
    **/
-  std::vector<Entry> parseMeasurements(json measurements_json);
+  std::vector<Entry> parseMeasurements(json measurements_json, double percent_outliers=0.0, const boost::optional<std::vector<std::string>> types = boost::none);
 
   /** @brief Reads arbitrary JSON from file
    * @param input_file_name: The file from which to read the json
@@ -56,7 +57,7 @@ class Parser {
   /// @brief Loads and parses a JRL file into a Dataset
   /// @param decompress_from_cbor if true indicates that input files are compressed with cbor and must be decompressed
   /// before parsing
-  Dataset parseDataset(std::string dataset_file, bool decompress_from_cbor = false);
+  Dataset parseDataset(std::string dataset_file, bool decompress_from_cbor = false, double percent_outliers=0.0, const boost::optional<std::vector<std::string>> types = boost::none);
 
   /// @brief Loads and parses a JRR file into a Results
   /// @param decompress_from_cbor if true indicates that input files are compressed with cbor and must be decompressed

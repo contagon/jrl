@@ -1,4 +1,5 @@
 #pragma once
+
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
@@ -50,12 +51,19 @@ class Dataset {
           boost::optional<std::map<char, TypedValues>> ground_truth,
           boost::optional<std::map<char, TypedValues>> initial_estimates);
 
+
   /// @brief returns the name of the dataset
   std::string name() const;
 
   /// @brief Returns a list of the robots active in this dataset
   std::vector<char> robots() const;
 
+  /** @brief Compute the percent of outliers
+   * @param robot_id: The robot identifier for the outlier percentage to return. Not required for single robot dataset.
+   * @returns The specified robot's ground truth values
+   */
+  double percentOutliers(const boost::optional<char>& robot_id);
+  
   /** @brief Returns the ground truth values for a specific robot.
    * @param robot_id: The robot identifier for the ground truth to return. Not required for single robot dataset.
    * @returns The specified robot's ground truth values

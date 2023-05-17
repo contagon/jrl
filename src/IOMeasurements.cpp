@@ -61,7 +61,7 @@ gtsam::NonlinearFactor::shared_ptr parseCombinedIMUFactor(json input_json) {
   params->n_gravity = io_values::parse<gtsam::Vector>(input_json["g"]);
 
   // Then construct TangentPreintegration
-  gtsam::Vector deltaXij = io_values::parse<gtsam::Vector>(input_json["deltaXij"]);
+  gtsam::Vector deltaXij = io_values::parse<gtsam::Vector>(input_json["measurement"]);
   gtsam::Matrix H_biassAcc = parseMatrix(input_json["H_biasAcc"], 9, 3);
   gtsam::Matrix H_biassOmega = parseMatrix(input_json["H_biasOmega"], 9, 3);
   double deltaTij = io_values::parse<double>(input_json["deltaTij"]);
@@ -97,7 +97,7 @@ json serializeCombinedIMUFactor(std::string type_tag, gtsam::NonlinearFactor::sh
     output["key" + std::to_string(i)] = imu_factor->keys()[i];
   }
   output["covariance"] = serializeCovariance(noise_model->covariance());
-  output["deltaXij"] = io_values::serialize<gtsam::Vector>(pim.preintegrated());
+  output["measurement"] = io_values::serialize<gtsam::Vector>(pim.preintegrated());
   output["H_biasAcc"] = serializeMatrix(pim.preintegrated_H_biasAcc());
   output["H_biasOmega"] = serializeMatrix(pim.preintegrated_H_biasOmega());
   output["deltaTij"] = io_values::serialize(pim.deltaTij());
