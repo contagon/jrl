@@ -94,20 +94,22 @@ std::vector<Entry> Parser::parseMeasurements(json measurements_json, double outl
 
       // If we sample as an outlier and it's specified as a type to introduce outliers to, perturb significantly
       if(sampler(generator) && (!outlier_types.is_initialized() || std::find(outlier_types->begin(), outlier_types->end(), tag) != outlier_types->end())){
-        gtsam::Key key = 0;
-        json measured_json = measurement["measurement"];
-        std::string meas_tag = measured_json["type"].get<std::string>();
+        gtsam::Key key = gtsam::symbol_shorthand::X(0);
+        std::string measured_tag = measurement["measurement"]["type"].get<std::string>();
         // Get measurement
         gtsam::Values valuesTemp;
-        value_accumulators_[tag](measured_json, key, valuesTemp);
+        value_accumulators_[measured_tag](measurement["measurement"], key, valuesTemp);
+        gtsam::Matrix cov = parseCovariance(measurement["covariance"], valuesTemp.dim());
+        // Get how far away for 99th percentile
+        Eigen::EigenSolver<Eigen::MatrixXd> es(cov);
+        Eigen::VectorXd perturb = es.eigenvectors().real().colwise().sum() * std::sqrt(-2*std::log(1 - 0.99) / es.eigenvalues().real().cwiseInverse().squaredNorm());
         // Perturb
-        gtsam::VectorValues delta = valuesTemp.zeroVectors();
-        delta.at(key).array() += 100;
-        valuesTemp.retract(delta);
+        gtsam::VectorValues delta;
+        delta.insert(key, perturb);
+        valuesTemp = valuesTemp.retract(delta);
         // Put it back
-        measured_json["measured"] = value_serializer_[tag](key, valuesTemp);
+        measurement["measurement"] = value_serializer_[measured_tag](key, valuesTemp);
         is_inlier.push_back(false);
-        // TODO: See if measured_json changes the original item
       } else {
         is_inlier.push_back(true);
       }
