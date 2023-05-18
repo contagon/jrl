@@ -62,7 +62,8 @@ class Dataset {
    * @param robot_id: The robot identifier for the outlier percentage to return. Not required for single robot dataset.
    * @returns The specified robot's ground truth values
    */
-  double percentOutliers(const boost::optional<char>& robot_id);
+  double percentOutliers(const boost::optional<char>& robot_id) const;
+  std::vector<bool> isOutlier(const boost::optional<char>& robot_id) const;
   
   /** @brief Returns the ground truth values for a specific robot.
    * @param robot_id: The robot identifier for the ground truth to return. Not required for single robot dataset.

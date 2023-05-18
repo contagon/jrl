@@ -85,7 +85,7 @@ std::vector<Entry> Parser::parseMeasurements(json measurements_json, double outl
   for (auto& entry_element : measurements_json) {
     uint64_t stamp = entry_element["stamp"].get<uint64_t>();
     gtsam::NonlinearFactorGraph entry_measurements;
-    std::vector<bool> is_inlier;
+    std::vector<bool> is_outlier;
     std::vector<std::string> type_tags;
 
     // Iterate through each measurement in each stamp
@@ -109,15 +109,15 @@ std::vector<Entry> Parser::parseMeasurements(json measurements_json, double outl
         valuesTemp = valuesTemp.retract(delta);
         // Put it back
         measurement["measurement"] = value_serializer_[measured_tag](key, valuesTemp);
-        is_inlier.push_back(false);
+        is_outlier.push_back(true);
       } else {
-        is_inlier.push_back(true);
+        is_outlier.push_back(false);
       }
 
       type_tags.push_back(tag);
       entry_measurements.push_back(measurement_parsers_[tag](measurement));
     }
-    measurements.push_back(Entry(stamp, type_tags, entry_measurements, is_inlier));
+    measurements.push_back(Entry(stamp, type_tags, entry_measurements, is_outlier));
   }
   return measurements;
 }

@@ -30,10 +30,10 @@ TEST(Outliers, CalcPercent){
         graph.push_back(factor);
     }
     std::vector<std::string> tags(N, jrl::PriorFactorPose2Tag);
-    std::vector<bool> inliers(N, true);
-    inliers.front() = false;
+    std::vector<bool> outliers(N, false);
+    outliers.front() = true;
 
-    std::map<char, std::vector<jrl::Entry>> entries = {{'a', {jrl::Entry(0, tags, graph, inliers)}}};
+    std::map<char, std::vector<jrl::Entry>> entries = {{'a', {jrl::Entry(0, tags, graph, outliers)}}};
     jrl::Dataset dataset("outlier_test", {'a'}, entries, boost::none, boost::none);
     
     EXPECT_DOUBLE_EQ(0.1, dataset.percentOutliers('a'));

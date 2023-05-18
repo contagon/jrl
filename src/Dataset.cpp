@@ -22,12 +22,23 @@ Dataset::Dataset(const std::string name, std::vector<char> robots, std::map<char
 }
 
 /**********************************************************************************************************************/
-double Dataset::percentOutliers(const boost::optional<char>& robot_id){
+std::vector<bool> Dataset::isOutlier(const boost::optional<char>& robot_id) const {
+  std::vector<Entry> measurements =  this->measurements(robot_id);
+  std::vector<bool> isOutlier;
+  isOutlier.reserve(this->factorGraph(robot_id).size());
+  for (jrl::Entry &entry : measurements) {
+    isOutlier.insert(isOutlier.end(), entry.is_outlier.begin(), entry.is_outlier.end());
+  }
+
+  return isOutlier;
+}
+
+double Dataset::percentOutliers(const boost::optional<char>& robot_id) const{
   std::vector<Entry> measurements = accessor<std::vector<Entry>>("measurements", measurements_, robot_id);
   uint64_t numOutliers = 0, numMM = 0;
   for(Entry& entry : measurements){
     numMM += entry.measurements.size();
-    numOutliers += std::count(entry.is_inlier.begin(), entry.is_inlier.end(), false);
+    numOutliers += std::count(entry.is_outlier.begin(), entry.is_outlier.end(), true);
   }
   return (double) numOutliers / numMM;
 }
