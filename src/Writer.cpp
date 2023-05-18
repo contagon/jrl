@@ -67,9 +67,8 @@ json Writer::serializeValues(TypedValues typed_values) {
   gtsam::Values values = typed_values.values;
   ValueTypes types = typed_values.types;
   json output;
-  for (auto& ktpair : types) {
-    gtsam::Key key = ktpair.first;
-    std::string type_tag = ktpair.second;
+  for (auto& key : values.keys()) {
+    std::string type_tag = types[key];
     json value_obj = value_serializers_[type_tag](key, values);
     value_obj["key"] = key;
     output.push_back(value_obj);

@@ -6,6 +6,7 @@
 #include <gtsam/nonlinear/Values.h>
 
 #include <vector>
+#include <boost/math/distributions/chi_squared.hpp>
 
 #include "jrl/Dataset.h"
 #include "jrl/Results.h"
@@ -63,7 +64,7 @@ inline std::pair<double, double> squaredPoseError<gtsam::Pose2>(gtsam::Pose2 est
  */
 template <class POSE_TYPE>
 inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset dataset, Results results,
-                                                             bool align_with_scale = false);
+                                                             bool align = true, bool align_with_scale = false);
 
 /** @brief Computes the SVE for the dataset
  * SVE is defined as the mean error between all combination of shared variable estimates
@@ -89,6 +90,10 @@ inline std::vector<std::vector<T>> cartesianProduct(const std::vector<std::vecto
  * @returns The Mean Residual
  */
 inline double computeMeanResidual(Dataset dataset, Results results);
+
+inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results results, double percentile=0.95);
+
+inline std::pair<double,double> computePrecisionRecall(char rid, Dataset dataset, Results results, double percentile=0.95);
 
 /** @brief Computes all metrics possible for the given datasets.
  *  Conditions to compute different metrics
