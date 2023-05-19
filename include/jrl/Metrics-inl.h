@@ -187,10 +187,9 @@ inline MetricSummary computeMetricSummary(Dataset dataset, Results results, bool
   return summary;
 }
 
-// TODO: Add tests for these
 /**********************************************************************************************************************/
 inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results results, double percentile){
-  gtsam::NonlinearFactorGraph graph = dataset.factorGraph();
+  gtsam::NonlinearFactorGraph graph = dataset.factorGraph(rid);
   gtsam::Values theta = results.robot_solutions[rid].values;
   std::vector<bool> isOutlier(graph.size());
 
