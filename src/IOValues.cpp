@@ -185,6 +185,7 @@ gtsam::StereoPoint2 parse<gtsam::StereoPoint2>(json input_json) {
 template <>
 json serialize<gtsam::StereoPoint2>(gtsam::StereoPoint2 point) {
   json output;
+  output["type"] = StereoPoint2Tag;
   output["uL"] = point.uL();
   output["uR"] = point.uR();
   output["v"] = point.v();

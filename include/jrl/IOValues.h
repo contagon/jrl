@@ -22,6 +22,7 @@ static const std::string VectorTag = "Vector";
 static const std::string ScalarTag = "Scalar";
 static const std::string BearingRangeTag = "BearingRange";
 static const std::string IMUBiasTag = "IMUBias";
+static const std::string StereoPoint2Tag = "StereoPoint2";
 
 namespace io_values {
 
