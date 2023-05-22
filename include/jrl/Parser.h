@@ -55,7 +55,7 @@ class Parser {
 
   /// @brief Get the default value serializer
   std::map<std::string, ValueParser> getDefaultValueAccumulators() { return value_accumulators_; };
-  
+
   /// @brief Get the default measurement serializer
   std::map<std::string, MeasurementParser> getDefaultMeasurementParsers() { return measurement_parsers_; };
 

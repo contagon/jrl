@@ -4,11 +4,10 @@
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/navigation/CombinedImuFactor.h>
 #include <gtsam/nonlinear/PriorFactor.h>
+#include <gtsam/sam/BearingRangeFactor.h>
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/StereoFactor.h>
 #include <jrl/IOValues.h>
-#include <gtsam/sam/BearingRangeFactor.h>
-#include <gtsam/slam/BetweenFactor.h>
 
 #include <nlohmann/json.hpp>
 

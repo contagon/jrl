@@ -57,7 +57,7 @@ class Writer {
 
   /// @brief Get the default value serializer
   std::map<std::string, ValueSerializer> getDefaultValueSerializer() { return value_serializers_; };
-  
+
   /// @brief Get the default measurement serializer
   std::map<std::string, MeasurementSerializer> getDefaultMeasurementSerializer() { return measurement_serializers_; };
 

@@ -28,13 +28,13 @@ inline std::pair<double, double> squaredPoseError<gtsam::Pose2>(gtsam::Pose2 est
 
 /**********************************************************************************************************************/
 template <class POSE_TYPE>
-inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset dataset, Results results,
-                                                             bool align, bool align_with_scale) {
+inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset dataset, Results results, bool align,
+                                                             bool align_with_scale) {
   // We have groundtruth so we can compute ATE
   if (dataset.containsGroundTruth()) {
     gtsam::Values ref = dataset.groundTruth(rid).filter<POSE_TYPE>();
     gtsam::Values est = results.robot_solutions[rid].values.filter<POSE_TYPE>();
-    if(align){
+    if (align) {
       est = alignment::align<POSE_TYPE>(est, ref, align_with_scale);
     }
 
@@ -188,24 +188,24 @@ inline MetricSummary computeMetricSummary(Dataset dataset, Results results, bool
 }
 
 /**********************************************************************************************************************/
-inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results results, double percentile){
+inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results results, double percentile) {
   gtsam::NonlinearFactorGraph graph = dataset.factorGraph(rid);
   gtsam::Values theta = results.robot_solutions[rid].values;
   std::vector<bool> isOutlier(graph.size());
 
-  for(uint64_t i=0; i < graph.size(); ++i){
+  for (uint64_t i = 0; i < graph.size(); ++i) {
     // Get mahalanobis distance
     double e = graph.at(i)->error(theta) * 2;
     uint64_t dim = graph.at(i)->dim();
     // Check if it's inside the percentile gap
-    isOutlier[i] = (boost::math::cdf(boost::math::chi_squared(dim-1), e) > percentile);
+    isOutlier[i] = (boost::math::cdf(boost::math::chi_squared(dim - 1), e) > percentile);
   }
 
   return isOutlier;
 }
 
 /**********************************************************************************************************************/
-inline std::pair<double,double> computePrecisionRecall(char rid, Dataset dataset, Results results, double percentile){
+inline std::pair<double, double> computePrecisionRecall(char rid, Dataset dataset, Results results, double percentile) {
   // Get ground truth inlier classification
   std::vector<bool> gtIsOutlier = dataset.isOutlier(rid);
 
@@ -213,23 +213,23 @@ inline std::pair<double,double> computePrecisionRecall(char rid, Dataset dataset
   std::vector<bool> estIsOutlier = classifyMeasurements(rid, dataset, results, percentile);
 
   // Compute what's what
-  uint64_t TP=0, TN=0, FP=0, FN=0;
-  for(uint64_t i = 0; i < gtIsOutlier.size(); ++i){
+  uint64_t TP = 0, TN = 0, FP = 0, FN = 0;
+  for (uint64_t i = 0; i < gtIsOutlier.size(); ++i) {
     bool gt = gtIsOutlier[i];
     bool est = estIsOutlier[i];
-    if(gt && est){
+    if (gt && est) {
       ++TP;
-    } else if(!gt && !est){
+    } else if (!gt && !est) {
       ++TN;
-    } else if(!gt && est){
+    } else if (!gt && est) {
       ++FP;
-    } else if(gt && !est){
+    } else if (gt && !est) {
       ++FN;
     }
   }
 
-  double precision = (TP+FP == 0) ? -1.0 : TP / (TP + FP);
-  double recall = (TP+FN == 0) ? -1.0 : TP / (TP + FN);
+  double precision = (TP + FP == 0) ? -1.0 : TP / (TP + FP);
+  double recall = (TP + FN == 0) ? -1.0 : TP / (TP + FN);
   return std::make_pair(precision, recall);
 }
 

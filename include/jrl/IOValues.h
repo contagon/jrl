@@ -3,9 +3,9 @@
 #include <gtsam/geometry/Point3.h>
 #include <gtsam/geometry/Pose2.h>
 #include <gtsam/geometry/Pose3.h>
-#include <gtsam/nonlinear/Values.h>
-#include <gtsam/navigation/ImuBias.h>
 #include <gtsam/geometry/StereoPoint2.h>
+#include <gtsam/navigation/ImuBias.h>
+#include <gtsam/nonlinear/Values.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -44,7 +44,6 @@ json serialize(T obj) {  // Base Parse function for builtins. Specialization pro
   output["value"] = obj;
   return output;
 }
-
 
 /**********************************************************************************************************************/
 // Rot2

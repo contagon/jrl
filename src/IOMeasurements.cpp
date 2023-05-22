@@ -46,7 +46,6 @@ json serializeCal3_S2Stereo(gtsam::Cal3_S2Stereo::shared_ptr calibration) {
   return output;
 }
 
-
 /**********************************************************************************************************************/
 // IMUFactor
 gtsam::NonlinearFactor::shared_ptr parseCombinedIMUFactor(json input_json) {
