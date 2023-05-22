@@ -95,6 +95,8 @@ PYBIND11_MODULE(jrl_python, m) {
       .def("initialization", &Dataset::initialization)
       .def("containsInitialization", &Dataset::containsInitialization)
       .def("measurements", &Dataset::measurements)
+      .def("outliers", &Dataset::outliers)
+      .def("factorGraph", &Dataset::factorGraph)
       .def(py::pickle(
           [](const Dataset &dataset) {  // __getstate__
             std::map<char, std::vector<Entry>> measurements;
@@ -217,6 +219,13 @@ PYBIND11_MODULE(jrl_python, m) {
   /**********************************************************************************************************************/
   m.def("computeMeanResidual", &metrics::computeMeanResidual, py::return_value_policy::copy, py::arg("dataset"),
         py::arg("results"));
+
+  /**********************************************************************************************************************/
+  m.def("classifyMeasurements", &metrics::classifyMeasurements, py::return_value_policy::copy, py::arg("rid"),
+        py::arg("dataset"), py::arg("results"), py::arg("percentile")=0.95);
+
+  m.def("computePrecisionRecall", &metrics::computePrecisionRecall, py::return_value_policy::copy, py::arg("rid"),
+        py::arg("dataset"), py::arg("results"), py::arg("percentile")=0.95);
 
   /**********************************************************************************************************************/
   m.def("computeSVEPoint2", &metrics::computeSVE<gtsam::Point2>, py::return_value_policy::copy, py::arg("results"));

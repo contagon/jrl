@@ -22,7 +22,7 @@ Dataset::Dataset(const std::string name, std::vector<char> robots, std::map<char
 }
 
 /**********************************************************************************************************************/
-std::vector<bool> Dataset::isOutlier(const boost::optional<char>& robot_id) const {
+std::vector<bool> Dataset::outliers(const boost::optional<char>& robot_id) const {
   std::vector<Entry> measurements = this->measurements(robot_id);
   std::vector<bool> isOutlier;
   isOutlier.reserve(this->factorGraph(robot_id).size());

@@ -207,7 +207,7 @@ inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results
 /**********************************************************************************************************************/
 inline std::pair<double, double> computePrecisionRecall(char rid, Dataset dataset, Results results, double percentile) {
   // Get ground truth inlier classification
-  std::vector<bool> gtIsOutlier = dataset.isOutlier(rid);
+  std::vector<bool> gtIsOutlier = dataset.outliers(rid);
 
   // Get estimated inlier classification
   std::vector<bool> estIsOutlier = classifyMeasurements(rid, dataset, results, percentile);
