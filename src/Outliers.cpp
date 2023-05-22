@@ -3,7 +3,8 @@
 namespace jrl {
 
 Dataset addOutliers(Dataset dataset, double percOutliers,
-                    const boost::optional<std::vector<std::string>> outlierTypes) {
+                    const boost::optional<std::vector<std::string>> outlierTypes,
+                    const boost::optional<std::string> newName) {
   // TODO Insert warning if dataset already has outliers
   std::default_random_engine generator;
   std::bernoulli_distribution sampler(percOutliers);
@@ -47,7 +48,9 @@ Dataset addOutliers(Dataset dataset, double percOutliers,
     }
   }
 
-  return Dataset(dataset.name(), dataset.robots(), allNewMeasurements, groundTruth, initialization);
+  std::string name = newName.is_initialized() ? newName.get() : dataset.name();
+
+  return Dataset(name, dataset.robots(), allNewMeasurements, groundTruth, initialization);
 }
 
 gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag) {

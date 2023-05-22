@@ -130,7 +130,6 @@ TEST(Outliers, SpecificType){
 TEST(Outliers, PrecisionRecall){
     // Fix seed
     srand(time(NULL));
-    double outliers = 0.25;
 
     // Make a dummy factor
     Eigen::Matrix3d cov = Eigen::Matrix3d::Identity();

@@ -13,7 +13,8 @@
 
 namespace jrl {
 Dataset addOutliers(Dataset dataset, double percOutliers,
-                    const boost::optional<std::vector<std::string>> outlierTypes = boost::none);
+                    const boost::optional<std::vector<std::string>> outlierTypes = boost::none,
+                    const boost::optional<std::string> newName = boost::none);
 
 gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag);
 }  // namespace jrl
