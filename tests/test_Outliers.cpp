@@ -150,9 +150,9 @@ TEST(Outliers, PrecisionRecall){
     gtValues.insert(X(0), gtsam::Pose2::Identity());
     std::map<char, jrl::TypedValues> gtTypes = {{'a', jrl::TypedValues(gtValues, {{X(0), jrl::Pose2Tag}})}};
 
-//     std::vector<std::string> tags(N, jrl::PriorFactorPose2Tag);
-//     std::map<char, std::vector<jrl::Entry>> entries = {{'a', {jrl::Entry(0, tags, graph, isOutlier)}}};
-//     jrl::Dataset dataset("outlier_test", {'a'}, entries, gtTypes, gtTypes);
+    std::vector<std::string> tags(N, jrl::PriorFactorPose2Tag);
+    std::map<char, std::vector<jrl::Entry>> entries = {{'a', {jrl::Entry(0, tags, graph, isOutlier)}}};
+    jrl::Dataset dataset("outlier_test", {'a'}, entries, gtTypes, gtTypes);
 
     jrl::Results results("test", "test", {'a'}, gtTypes);
 
