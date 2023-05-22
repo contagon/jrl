@@ -1,5 +1,4 @@
 #pragma once
-#include <random>
 #include <gtsam/nonlinear/Values.h>
 
 #include <nlohmann/json.hpp>
@@ -53,6 +52,12 @@ class Parser {
  public:
   /// @brief Constructors a parser object
   Parser();
+
+  /// @brief Get the default value serializer
+  std::map<std::string, ValueParser> getDefaultValueAccumulators() { return value_accumulators_; };
+  
+  /// @brief Get the default measurement serializer
+  std::map<std::string, MeasurementParser> getDefaultMeasurementParsers() { return measurement_parsers_; };
 
   /// @brief Loads and parses a JRL file into a Dataset
   /// @param decompress_from_cbor if true indicates that input files are compressed with cbor and must be decompressed

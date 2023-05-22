@@ -3,7 +3,6 @@
 #include <gtsam/sam/RangeFactor.h>
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
-#include <gtsam/linear/VectorValues.h>
 
 #include <fstream>
 
