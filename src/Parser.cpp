@@ -76,49 +76,19 @@ TypedValues Parser::parseValues(json values_json) {
 }
 
 /**********************************************************************************************************************/
-std::vector<Entry> Parser::parseMeasurements(json measurements_json, double outlier_percent, const boost::optional<std::vector<std::string>> outlier_types) {
+std::vector<Entry> Parser::parseMeasurements(json measurements_json) {
   std::vector<Entry> measurements;
-  std::default_random_engine generator;
-  std::bernoulli_distribution sampler(outlier_percent);
-  std::map<std::string, ValueSerializer> value_serializer_ = jrl::Writer().getDefaultValueSerializer();
-
-  // Iterate through each stamp
   for (auto& entry_element : measurements_json) {
     uint64_t stamp = entry_element["stamp"].get<uint64_t>();
+    std::vector<bool> outliers = entry_element["is_outlier"];
     gtsam::NonlinearFactorGraph entry_measurements;
-    std::vector<bool> is_outlier;
     std::vector<std::string> type_tags;
-
-    // Iterate through each measurement in each stamp
     for (auto& measurement : entry_element["measurements"]) {
       std::string tag = measurement["type"].get<std::string>();
-
-      // If we sample as an outlier and it's specified as a type to introduce outliers to, perturb significantly
-      if(sampler(generator) && (!outlier_types.is_initialized() || std::find(outlier_types->begin(), outlier_types->end(), tag) != outlier_types->end())){
-        gtsam::Key key = gtsam::symbol_shorthand::X(0);
-        std::string measured_tag = measurement["measurement"]["type"].get<std::string>();
-        // Get measurement
-        gtsam::Values valuesTemp;
-        value_accumulators_[measured_tag](measurement["measurement"], key, valuesTemp);
-        gtsam::Matrix cov = parseCovariance(measurement["covariance"], valuesTemp.dim());
-        // Get how far away for 99th percentile
-        Eigen::EigenSolver<Eigen::MatrixXd> es(cov);
-        Eigen::VectorXd perturb = es.eigenvectors().real().colwise().sum() * std::sqrt(-2*std::log(1 - 0.999) / es.eigenvalues().real().cwiseInverse().squaredNorm());
-        // Perturb
-        gtsam::VectorValues delta;
-        delta.insert(key, perturb);
-        valuesTemp = valuesTemp.retract(delta);
-        // Put it back
-        measurement["measurement"] = value_serializer_[measured_tag](key, valuesTemp);
-        is_outlier.push_back(true);
-      } else {
-        is_outlier.push_back(false);
-      }
-
       type_tags.push_back(tag);
       entry_measurements.push_back(measurement_parsers_[tag](measurement));
     }
-    measurements.push_back(Entry(stamp, type_tags, entry_measurements, is_outlier));
+    measurements.push_back(Entry(stamp, type_tags, entry_measurements, outliers));
   }
   return measurements;
 }
@@ -137,7 +107,7 @@ json Parser::parseJson(std::string input_file_name, bool decompress_from_cbor) {
 }
 
 /**********************************************************************************************************************/
-Dataset Parser::parseDataset(std::string dataset_file, bool decompress_from_cbor, double outlier_percent, const boost::optional<std::vector<std::string>> outlier_types) {
+Dataset Parser::parseDataset(std::string dataset_file, bool decompress_from_cbor) {
   json dataset_json = parseJson(dataset_file, decompress_from_cbor);
 
   // Parse Header information
@@ -165,7 +135,7 @@ Dataset Parser::parseDataset(std::string dataset_file, bool decompress_from_cbor
   // Parse Measurements if it exists
   std::map<char, std::vector<Entry>> measurements;
   for (auto& el : dataset_json["measurements"].items()) {
-    measurements[el.key()[0]] = parseMeasurements(el.value(), outlier_percent, outlier_types);
+    measurements[el.key()[0]] = parseMeasurements(el.value());
   }
 
   return Dataset(name, robots, measurements, groundtruth, initialization);
