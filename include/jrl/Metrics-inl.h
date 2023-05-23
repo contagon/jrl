@@ -188,9 +188,8 @@ inline MetricSummary computeMetricSummary(Dataset dataset, Results results, bool
 }
 
 /**********************************************************************************************************************/
-inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results results, double percentile) {
-  gtsam::NonlinearFactorGraph graph = dataset.factorGraph(rid);
-  gtsam::Values theta = results.robot_solutions[rid].values;
+inline std::vector<bool> classifyMeasurements(gtsam::NonlinearFactorGraph graph, gtsam::Values theta,
+                                              double percentile) {
   std::vector<bool> isOutlier(graph.size());
 
   for (uint64_t i = 0; i < graph.size(); ++i) {
@@ -205,18 +204,12 @@ inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results
 }
 
 /**********************************************************************************************************************/
-inline std::pair<double, double> computePrecisionRecall(char rid, Dataset dataset, Results results, double percentile) {
-  // Get ground truth inlier classification
-  std::vector<bool> gtIsOutlier = dataset.outliers(rid);
-
-  // Get estimated inlier classification
-  std::vector<bool> estIsOutlier = classifyMeasurements(rid, dataset, results, percentile);
-
+inline std::pair<double, double> computePrecisionRecall(std::vector<bool> gtOutlier, std::vector<bool> estOutlier) {
   // Compute what's what
   uint64_t TP = 0, TN = 0, FP = 0, FN = 0;
-  for (uint64_t i = 0; i < gtIsOutlier.size(); ++i) {
-    bool gt = gtIsOutlier[i];
-    bool est = estIsOutlier[i];
+  for (uint64_t i = 0; i < gtOutlier.size(); ++i) {
+    bool gt = gtOutlier[i];
+    bool est = estOutlier[i];
     if (gt && est) {
       ++TP;
     } else if (!gt && !est) {
@@ -231,6 +224,23 @@ inline std::pair<double, double> computePrecisionRecall(char rid, Dataset datase
   double precision = (TP + FP == 0) ? -1.0 : TP / (TP + FP);
   double recall = (TP + FN == 0) ? -1.0 : TP / (TP + FN);
   return std::make_pair(precision, recall);
+}
+
+inline std::pair<double, double> computePrecisionRecall(char rid, Dataset dataset, Results results, double percentile) {
+  // Get ground truth inlier classification
+  std::vector<bool> gtIsOutlier = dataset.outliers(rid);
+  // Get estimated inlier classification
+  std::vector<bool> estIsOutlier =
+      classifyMeasurements(dataset.factorGraph(rid), results.robot_solutions['a'].values, percentile);
+  return computePrecisionRecall(gtIsOutlier, estIsOutlier);
+}
+
+inline std::pair<double, double> computePrecisionRecall(Entry entry, gtsam::Values values, double percentile) {
+  // Get ground truth inlier classification
+  std::vector<bool> gtIsOutlier = entry.is_outlier;
+  // Get estimated inlier classification
+  std::vector<bool> estIsOutlier = classifyMeasurements(entry.measurements, values, percentile);
+  return computePrecisionRecall(gtIsOutlier, estIsOutlier);
 }
 
 /**********************************************************************************************************************/

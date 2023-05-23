@@ -60,6 +60,7 @@ PYBIND11_MODULE(jrl_python, m) {
       .def_readwrite("stamp", &Entry::stamp)
       .def_readwrite("measurement_types", &Entry::measurement_types)
       .def_readwrite("measurements", &Entry::measurements)
+      .def_readwrite("is_outlier", &Entry::is_outlier)
       .def(py::pickle(
           [](const Entry &entry) {  // __getstate__
             return py::make_tuple(entry.stamp, entry.measurement_types, entry.measurements);
@@ -221,11 +222,15 @@ PYBIND11_MODULE(jrl_python, m) {
         py::arg("results"));
 
   /**********************************************************************************************************************/
-  m.def("classifyMeasurements", &metrics::classifyMeasurements, py::return_value_policy::copy, py::arg("rid"),
-        py::arg("dataset"), py::arg("results"), py::arg("percentile")=0.95);
+  m.def("classifyMeasurements", &metrics::classifyMeasurements,
+        py::return_value_policy::copy, py::arg("graph"), py::arg("theta"), py::arg("percentile")=0.95);
 
-  m.def("computePrecisionRecall", &metrics::computePrecisionRecall, py::return_value_policy::copy, py::arg("rid"),
-        py::arg("dataset"), py::arg("results"), py::arg("percentile")=0.95);
+  m.def("computePrecisionRecall", py::overload_cast<std::vector<bool>, std::vector<bool>>(&metrics::computePrecisionRecall), 
+      py::return_value_policy::copy, py::arg("gtOutlier"), py::arg("estOutlier"));
+  m.def("computePrecisionRecall", py::overload_cast<char, Dataset, Results, double>(&metrics::computePrecisionRecall), 
+      py::return_value_policy::copy, py::arg("rid"), py::arg("dataset"), py::arg("results"), py::arg("percentile")=0.95);
+  m.def("computePrecisionRecall", py::overload_cast<Entry, gtsam::Values, double>(&metrics::computePrecisionRecall), 
+      py::return_value_policy::copy, py::arg("entry"), py::arg("values"), py::arg("percentile")=0.95);
 
   /**********************************************************************************************************************/
   m.def("computeSVEPoint2", &metrics::computeSVE<gtsam::Point2>, py::return_value_policy::copy, py::arg("results"));

@@ -2,8 +2,7 @@
 
 namespace jrl {
 
-Dataset addOutliers(Dataset dataset, double percOutliers,
-                    const boost::optional<std::vector<std::string>> outlierTypes,
+Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<std::vector<std::string>> outlierTypes,
                     const boost::optional<std::string> newName) {
   // TODO Insert warning if dataset already has outliers
   std::default_random_engine generator;
@@ -74,8 +73,9 @@ gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_
 
   // Get how far away for 99th percentile
   Eigen::EigenSolver<Eigen::MatrixXd> es(cov);
-  Eigen::VectorXd perturb = es.eigenvectors().real().colwise().sum() *
-                            std::sqrt(-2 * std::log(1 - 0.999) / es.eigenvalues().real().cwiseInverse().squaredNorm());
+  Eigen::VectorXd perturb =
+      es.eigenvectors().real().colwise().sum() *
+      std::sqrt(-2 * std::log(1 - 0.999999999) / es.eigenvalues().real().cwiseInverse().squaredNorm());
 
   // Perturb
   gtsam::VectorValues delta;

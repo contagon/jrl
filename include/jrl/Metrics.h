@@ -91,10 +91,15 @@ inline std::vector<std::vector<T>> cartesianProduct(const std::vector<std::vecto
  */
 inline double computeMeanResidual(Dataset dataset, Results results);
 
-inline std::vector<bool> classifyMeasurements(char rid, Dataset dataset, Results results, double percentile = 0.95);
+inline std::vector<bool> classifyMeasurements(gtsam::NonlinearFactorGraph graph, gtsam::Values theta,
+                                              double percentile = 0.95);
+
+inline std::pair<double, double> computePrecisionRecall(std::vector<bool> gtOutlier, std::vector<bool> estOutlier);
 
 inline std::pair<double, double> computePrecisionRecall(char rid, Dataset dataset, Results results,
                                                         double percentile = 0.95);
+
+inline std::pair<double, double> computePrecisionRecall(Entry entry, gtsam::Values values, double percentile = 0.95);
 
 /** @brief Computes all metrics possible for the given datasets.
  *  Conditions to compute different metrics
