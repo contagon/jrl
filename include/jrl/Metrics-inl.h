@@ -221,8 +221,8 @@ inline std::pair<double, double> computePrecisionRecall(std::vector<bool> gtOutl
     }
   }
 
-  double precision = (TP + FP == 0) ? -1.0 : TP / (TP + FP);
-  double recall = (TP + FN == 0) ? -1.0 : TP / (TP + FN);
+  double precision = (TP + FP == 0) ? -1.0 : (double) TP / (TP + FP);
+  double recall = (TP + FN == 0) ? -1.0 : (double) TP / (TP + FN);
   return std::make_pair(precision, recall);
 }
 
