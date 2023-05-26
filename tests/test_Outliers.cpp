@@ -100,7 +100,7 @@ TEST(Outliers, ChangesValue){
     gtsam::PriorFactor<gtsam::Pose2>::shared_ptr factor = boost::make_shared<gtsam::PriorFactor<gtsam::Pose2>>(X(0), gtsam::Pose2::Identity(), cov);
 
     // Perturb factor
-    gtsam::NonlinearFactor::shared_ptr outlierFactor = jrl::perturbFactor(factor, jrl::PriorFactorPose2Tag);
+    gtsam::NonlinearFactor::shared_ptr outlierFactor = jrl::perturbFactor(factor, jrl::PriorFactorPose2Tag, 10);
     gtsam::PriorFactor<gtsam::Pose2>::shared_ptr outlierFactorPrior = boost::dynamic_pointer_cast<gtsam::PriorFactor<gtsam::Pose2>>(outlierFactor);
     EXPECT_MATRICES_NOT_EQ(factor->prior().matrix(), outlierFactorPrior->prior().matrix());
 }

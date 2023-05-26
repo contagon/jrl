@@ -10,6 +10,7 @@
 #include "jrl/Parser.h"
 #include "jrl/Results.h"
 #include "jrl/Writer.h"
+#include "jrl/Outliers.h"
 #include "typecasters.h"
 
 namespace py = pybind11;
@@ -92,10 +93,13 @@ PYBIND11_MODULE(jrl_python, m) {
       .def("name", &Dataset::name)
       .def("robots", &Dataset::robots)
       .def("groundTruth", &Dataset::groundTruth)
+      .def("groundTruthWithTypes", &Dataset::groundTruthWithTypes)
       .def("containsGroundTruth", &Dataset::containsGroundTruth)
       .def("initialization", &Dataset::initialization)
+      .def("initializationWithTypes", &Dataset::initializationWithTypes)
       .def("containsInitialization", &Dataset::containsInitialization)
       .def("measurements", &Dataset::measurements)
+      .def("percentOutliers", &Dataset::percentOutliers)
       .def("outliers", &Dataset::outliers)
       .def("factorGraph", &Dataset::factorGraph)
       .def(py::pickle(
@@ -247,4 +251,9 @@ PYBIND11_MODULE(jrl_python, m) {
         py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
   m.def("computeATEPose3", &metrics::computeATE<gtsam::Pose3>, py::return_value_policy::copy, py::arg("rid"),
         py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
+
+
+  // ------------------------- OUTLIERS ------------------------- //
+  m.def("addOutliers", &addOutliers, py::return_value_policy::copy,
+      py::arg("dataset"), py::arg("percOutliers"), py::arg("outlierTypes"), py::arg("newName"), py::arg("std")=5);  
 }

@@ -3,7 +3,7 @@
 namespace jrl {
 
 Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<std::vector<std::string>> outlierTypes,
-                    const boost::optional<std::string> newName) {
+                    const boost::optional<std::string> newName, const double std) {
   // TODO Insert warning if dataset already has outliers
   std::default_random_engine generator;
   std::bernoulli_distribution sampler(percOutliers);
@@ -22,7 +22,7 @@ Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<
                                                          entry.measurement_types[j]) != outlierTypes->end())) {
           entry.is_outlier[j] = true;
           gtsam::NonlinearFactor::shared_ptr outlierFactor =
-              perturbFactor(entry.measurements.at(j), entry.measurement_types[j]);
+              perturbFactor(entry.measurements.at(j), entry.measurement_types[j], std);
           entry.measurements.replace(j, outlierFactor);
         }
       }
@@ -52,7 +52,7 @@ Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<
   return Dataset(name, dataset.robots(), allNewMeasurements, groundTruth, initialization);
 }
 
-gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag) {
+gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag, double std) {
   // Get helpers
   auto measurement_serializer = jrl::Writer().getDefaultMeasurementSerializer();
   auto value_serializer = jrl::Writer().getDefaultValueSerializer();
@@ -73,9 +73,11 @@ gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_
 
   // Get how far away for 99th percentile
   Eigen::EigenSolver<Eigen::MatrixXd> es(cov);
-  Eigen::VectorXd perturb =
-      es.eigenvectors().real().colwise().sum() *
-      std::sqrt(-2 * std::log(1 - 0.999999999) / es.eigenvalues().real().cwiseInverse().squaredNorm());
+  // Eigen::VectorXd perturb =
+  //     es.eigenvectors().real().colwise().sum() *
+  //     std::sqrt(-2 * std::log(1 - 0.999999999) / es.eigenvalues().real().cwiseInverse().squaredNorm()) * 100;
+  Eigen::VectorXd perturb = es.eigenvectors().real() * es.eigenvalues().real().cwiseSqrt();
+  perturb.array() *= std / std::sqrt(cov.cols());
 
   // Perturb
   gtsam::VectorValues delta;
