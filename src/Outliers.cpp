@@ -22,7 +22,7 @@ Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<
                                                          entry.measurement_types[j]) != outlierTypes->end())) {
           entry.is_outlier[j] = true;
           gtsam::NonlinearFactor::shared_ptr outlierFactor =
-              perturbFactor(entry.measurements.at(j), entry.measurement_types[j], std);
+              perturbFactor(entry.measurements.at(j), entry.measurement_types[j], std, generator);
           entry.measurements.replace(j, outlierFactor);
         }
       }
@@ -52,12 +52,16 @@ Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<
   return Dataset(name, dataset.robots(), allNewMeasurements, groundTruth, initialization);
 }
 
-gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag, double std) {
+gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag, double std,
+                                                 boost::optional<std::default_random_engine> generator) {
   // Get helpers
   auto measurement_serializer = jrl::Writer().getDefaultMeasurementSerializer();
   auto value_serializer = jrl::Writer().getDefaultValueSerializer();
   auto measurement_parser = jrl::Parser().getDefaultMeasurementParsers();
   auto value_parser = jrl::Parser().getDefaultValueAccumulators();
+  if (!generator.is_initialized()) {
+    generator = std::default_random_engine();
+  }
 
   // Convert to json
   json measurementSerialized = measurement_serializer[tag](factor);
@@ -69,15 +73,21 @@ gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_
   // Get value of measured/covariance
   gtsam::Values valuesTemp;
   value_parser[measured_tag](measurementSerialized["measurement"], key, valuesTemp);
-  gtsam::Matrix cov = io_measurements::parseCovariance(measurementSerialized["covariance"], valuesTemp.dim());
+  uint64_t dim = valuesTemp.dim();
+  gtsam::Matrix cov = io_measurements::parseCovariance(measurementSerialized["covariance"], dim);
 
-  // Get how far away for 99th percentile
+  // Get random direction for perturbation
+  std::uniform_real_distribution<double> sampler(-1.0, 1.0);
+  Eigen::VectorXd coeffs = Eigen::VectorXd::Zero(dim);
+  for (uint64_t i = 0; i < dim; ++i) {
+    coeffs[i] = sampler(generator.get());
+  }
+  coeffs.normalize();
+
+  // Perturb in gotten direction std away
   Eigen::EigenSolver<Eigen::MatrixXd> es(cov);
-  // Eigen::VectorXd perturb =
-  //     es.eigenvectors().real().colwise().sum() *
-  //     std::sqrt(-2 * std::log(1 - 0.999999999) / es.eigenvalues().real().cwiseInverse().squaredNorm()) * 100;
-  Eigen::VectorXd perturb = es.eigenvectors().real() * es.eigenvalues().real().cwiseSqrt();
-  perturb.array() *= std / std::sqrt(cov.cols());
+  Eigen::VectorXd perturb = es.eigenvectors().real() * (es.eigenvalues().real().cwiseSqrt() * coeffs);
+  perturb.array() *= std;
 
   // Perturb
   gtsam::VectorValues delta;

@@ -155,8 +155,8 @@ TEST(Outliers, PrecisionRecall){
 
     jrl::Results results("test", "test", {'a'}, gtTypes);
 
-    std::pair<double,double> prec_recall = jrl::metrics::computePrecisionRecall('a', dataset, results);
+    jrl::OutlierSummary summary = jrl::metrics::computeOutlierSummary('a', dataset, results);
 
-    EXPECT_DOUBLE_EQ(1.0, prec_recall.first);
-    EXPECT_DOUBLE_EQ(1.0, prec_recall.second);
+    EXPECT_DOUBLE_EQ(1.0, summary.precision);
+    EXPECT_DOUBLE_EQ(1.0, summary.recall);
 }

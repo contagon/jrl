@@ -37,6 +37,23 @@ struct MetricSummary {
   boost::optional<double> mean_residual{boost::none};
 };
 
+struct OutlierSummary {
+  // TODO: Documentation on this
+  // TODO: Writer/parser
+  // TODO: More information about robot/dataset/method/thresholds
+  // TODO: Save full ROC
+  double precision = -1;
+  double recall = -1;
+  double fpr = -1;
+  double accuracy = -1;
+  double F1 = -1;
+
+  uint64_t TP = 0;
+  uint64_t TN = 0;
+  uint64_t FP = 0;
+  uint64_t FN = 0;
+};
+
 namespace metrics {
 
 namespace internal {
@@ -94,12 +111,11 @@ inline double computeMeanResidual(Dataset dataset, Results results);
 inline std::vector<bool> classifyMeasurements(gtsam::NonlinearFactorGraph graph, gtsam::Values theta,
                                               double percentile = 0.95);
 
-inline std::pair<double, double> computePrecisionRecall(std::vector<bool> gtOutlier, std::vector<bool> estOutlier);
+inline OutlierSummary computeOutlierSummary(std::vector<bool> gtOutlier, std::vector<bool> estOutlier);
 
-inline std::pair<double, double> computePrecisionRecall(char rid, Dataset dataset, Results results,
-                                                        double percentile = 0.95);
+inline OutlierSummary computeOutlierSummary(char rid, Dataset dataset, Results results, double percentile = 0.95);
 
-inline std::pair<double, double> computePrecisionRecall(Entry entry, gtsam::Values values, double percentile = 0.95);
+inline OutlierSummary computeOutlierSummary(Entry entry, gtsam::Values values, double percentile = 0.95);
 
 /** @brief Computes all metrics possible for the given datasets.
  *  Conditions to compute different metrics

@@ -211,6 +211,18 @@ PYBIND11_MODULE(jrl_python, m) {
       .def_readwrite("sve", &MetricSummary::sve)
       .def_readwrite("mean_residual", &MetricSummary::mean_residual);
 
+  py::class_<OutlierSummary>(m, "OutlierSummary")
+      .def(py::init<>())
+      .def_readwrite("precision", &OutlierSummary::precision)
+      .def_readwrite("recall", &OutlierSummary::recall)
+      .def_readwrite("fpr", &OutlierSummary::fpr)
+      .def_readwrite("accuracy", &OutlierSummary::accuracy)
+      .def_readwrite("F1", &OutlierSummary::F1)
+      .def_readwrite("TP", &OutlierSummary::TP)
+      .def_readwrite("TN", &OutlierSummary::TN)
+      .def_readwrite("FP", &OutlierSummary::FP)
+      .def_readwrite("FN", &OutlierSummary::FN);
+
   /**********************************************************************************************************************/
   m.def("computeMetricSummaryPoint2", &metrics::computeMetricSummary<gtsam::Point2>, py::return_value_policy::copy,
         py::arg("dataset"), py::arg("results"), py::arg("align_with_scale") = false);
@@ -229,11 +241,11 @@ PYBIND11_MODULE(jrl_python, m) {
   m.def("classifyMeasurements", &metrics::classifyMeasurements,
         py::return_value_policy::copy, py::arg("graph"), py::arg("theta"), py::arg("percentile")=0.95);
 
-  m.def("computePrecisionRecall", py::overload_cast<std::vector<bool>, std::vector<bool>>(&metrics::computePrecisionRecall), 
+  m.def("computeOutlierSummary", py::overload_cast<std::vector<bool>, std::vector<bool>>(&metrics::computeOutlierSummary), 
       py::return_value_policy::copy, py::arg("gtOutlier"), py::arg("estOutlier"));
-  m.def("computePrecisionRecall", py::overload_cast<char, Dataset, Results, double>(&metrics::computePrecisionRecall), 
+  m.def("computeOutlierSummary", py::overload_cast<char, Dataset, Results, double>(&metrics::computeOutlierSummary), 
       py::return_value_policy::copy, py::arg("rid"), py::arg("dataset"), py::arg("results"), py::arg("percentile")=0.95);
-  m.def("computePrecisionRecall", py::overload_cast<Entry, gtsam::Values, double>(&metrics::computePrecisionRecall), 
+  m.def("computeOutlierSummary", py::overload_cast<Entry, gtsam::Values, double>(&metrics::computeOutlierSummary), 
       py::return_value_policy::copy, py::arg("entry"), py::arg("values"), py::arg("percentile")=0.95);
 
   /**********************************************************************************************************************/
