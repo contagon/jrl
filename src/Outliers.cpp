@@ -86,7 +86,7 @@ gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_
 
   // Perturb in gotten direction std away
   Eigen::EigenSolver<Eigen::MatrixXd> es(cov);
-  Eigen::VectorXd perturb = es.eigenvectors().real() * (es.eigenvalues().real().cwiseSqrt() * coeffs);
+  Eigen::VectorXd perturb = es.eigenvectors().real() * (coeffs * es.eigenvalues().real().cwiseSqrt());
   perturb.array() *= std;
 
   // Perturb
