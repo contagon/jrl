@@ -40,7 +40,8 @@ PYBIND11_MODULE(jrl_python, m) {
   m.attr("BearingRangeFactorPose2Tag") = py::str(BearingRangeFactorPose2Tag);
   m.attr("BearingRangeFactorPose3Tag") = py::str(BearingRangeFactorPose3Tag);
   m.attr("PriorFactorPoint2Tag") = py::str(PriorFactorPoint2Tag);
-  m.attr("PriorFactorPointTag") = py::str(PriorFactorPoint3Tag);
+  m.attr("PriorFactorPoint3Tag") = py::str(PriorFactorPoint3Tag);
+  m.attr("PriorFactorIMUBiasTag") = py::str(PriorFactorIMUBiasTag);
   m.attr("BetweenFactorPoint2Tag") = py::str(BetweenFactorPoint2Tag);
   m.attr("BetweenFactorPoint3Tag") = py::str(BetweenFactorPoint3Tag);
   m.attr("StereoFactorPose3Point3Tag") = py::str(StereoFactorPose3Point3Tag);
@@ -137,6 +138,8 @@ PYBIND11_MODULE(jrl_python, m) {
       .def(py::init<const std::string &, std::vector<char> &>())
       .def("addEntry", &DatasetBuilder::addEntry, py::arg("robot"), py::arg("stamp"), py::arg("measurements"),
            py::arg("measurement_types"), py::arg("initialization") = py::none(), py::arg("groundtruth") = py::none())
+      .def("addGroundTruth", &DatasetBuilder::addGroundTruth, py::arg("robot"), py::arg("groundtruth"))
+      .def("addInitialization", &DatasetBuilder::addInitialization, py::arg("robot"), py::arg("initialization"))
       .def("build", &DatasetBuilder::build);
 
   /**
