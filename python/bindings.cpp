@@ -63,13 +63,16 @@ PYBIND11_MODULE(jrl_python, m) {
       .def_readwrite("measurement_types", &Entry::measurement_types)
       .def_readwrite("measurements", &Entry::measurements)
       .def_readwrite("is_outlier", &Entry::is_outlier)
+      .def("remove", &Entry::remove)
+      .def("filter", &Entry::filter)
       .def(py::pickle(
           [](const Entry &entry) {  // __getstate__
-            return py::make_tuple(entry.stamp, entry.measurement_types, entry.measurements);
+            return py::make_tuple(entry.stamp, entry.measurement_types, entry.measurements, entry.is_outlier);
           },
           [](py::tuple tup) {  // __setstate__
             Entry entry(tup[0].cast<uint64_t>(), tup[1].cast<std::vector<std::string>>(),
-                        tup[2].cast<gtsam::NonlinearFactorGraph>());
+                        tup[2].cast<gtsam::NonlinearFactorGraph>(),
+                        tup[3].cast<std::vector<bool>>());
             return entry;
           }));
 
