@@ -75,8 +75,10 @@ class Parser {
   MetricSummary parseMetricSummary(std::string metric_summary_file, bool decompress_from_cbor = false);
 
   // TODO
-  // void registerValueParser(std::string tag, ValueParser parser_fn);
-  // void registerMeasurementParser(std::string tag, MeasurementParser parser_fn);
+  void registerValueParser(std::string tag, ValueParser parser_fn) { value_accumulators_[tag] = parser_fn; };
+  void registerMeasurementParser(std::string tag, MeasurementParser parser_fn) {
+    measurement_parsers_[tag] = parser_fn;
+  };
 };
 
 }  // namespace jrl
