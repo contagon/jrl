@@ -66,7 +66,7 @@ TypedValues Parser::parseValues(const json& values_json) {
   gtsam::Values values;
   ValueTypes value_types;
   for (auto& value_element : values_json) {
-    gtsam::Key key = value_element["key"].get<uint64_t>();
+    gtsam::Key key = value_element["k"].get<uint64_t>();
     std::string type_tag = value_element["type"].get<std::string>();
     value_types[key] = type_tag;
     value_accumulators_[type_tag](value_element, key, values);

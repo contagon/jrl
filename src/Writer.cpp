@@ -71,7 +71,7 @@ json Writer::serializeValues(TypedValues typed_values) {
   for (auto& key : values.keys()) {
     std::string type_tag = types[key];
     json value_obj = value_serializers_[type_tag](key, values);
-    value_obj["key"] = key;
+    value_obj["k"] = key;
     output.push_back(value_obj);
   }
   return output;

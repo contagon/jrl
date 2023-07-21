@@ -46,7 +46,7 @@ json serialize<gtsam::Pose2>(gtsam::Pose2 pose) {
 // Rot3
 template <>
 gtsam::Rot3 parse<gtsam::Rot3>(const json& input_json) {
-  std::vector<double> q = input_json["rotation"].get<std::vector<double>>();
+  std::vector<double> q = input_json["r"].get<std::vector<double>>();
   return gtsam::Rot3::Quaternion(q[0], q[1], q[2], q[3]);
 }
 
@@ -55,7 +55,7 @@ json serialize<gtsam::Rot3>(gtsam::Rot3 rot) {
   json output;
   output["type"] = Rot3Tag;
   gtsam::Vector q = rot.quaternion();
-  output["rotation"] = {q(0), q(1), q(2), q(3)};
+  output["r"] = {q(0), q(1), q(2), q(3)};
   return output;
 }
 
@@ -63,9 +63,9 @@ json serialize<gtsam::Rot3>(gtsam::Rot3 rot) {
 // POSE3
 template <>
 gtsam::Pose3 parse<gtsam::Pose3>(const json& input_json) {
-  std::vector<double> t = input_json["translation"].get<std::vector<double>>();
+  std::vector<double> t = input_json["t"].get<std::vector<double>>();
   gtsam::Vector3 translation(t.data());
-  std::vector<double> q = input_json["rotation"].get<std::vector<double>>();
+  std::vector<double> q = input_json["r"].get<std::vector<double>>();
   gtsam::Rot3 rotation = gtsam::Rot3::Quaternion(q[0], q[1], q[2], q[3]);
   return gtsam::Pose3(rotation, translation);
 }
@@ -75,8 +75,8 @@ json serialize<gtsam::Pose3>(gtsam::Pose3 pose) {
   json output;
   output["type"] = Pose3Tag;
   gtsam::Vector q = pose.rotation().quaternion();
-  output["translation"] = {pose.x(), pose.y(), pose.z()};
-  output["rotation"] = {q(0), q(1), q(2), q(3)};
+  output["t"] = {pose.x(), pose.y(), pose.z()};
+  output["r"] = {q(0), q(1), q(2), q(3)};
   return output;
 }
 
