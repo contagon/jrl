@@ -3,7 +3,8 @@
 namespace jrl {
 
 Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<std::vector<std::string>> outlierTypes,
-                    const boost::optional<std::string> newName, const double std) {
+                    const boost::optional<std::string> newName, const double std, const boost::optional<jrl::Parser> parser,
+                    const boost::optional<jrl::Writer> writer) {
   // TODO Insert warning if dataset already has outliers
   std::default_random_engine generator;
   std::bernoulli_distribution sampler(percOutliers);
@@ -22,7 +23,7 @@ Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<
                                                          entry.measurement_types[j]) != outlierTypes->end())) {
           entry.is_outlier[j] = true;
           gtsam::NonlinearFactor::shared_ptr outlierFactor =
-              perturbFactor(entry.measurements.at(j), entry.measurement_types[j], std, generator);
+              perturbFactor(entry.measurements.at(j), entry.measurement_types[j], std, generator, parser, writer);
           entry.measurements.replace(j, outlierFactor);
         }
       }
@@ -53,12 +54,24 @@ Dataset addOutliers(Dataset dataset, double percOutliers, const boost::optional<
 }
 
 gtsam::NonlinearFactor::shared_ptr perturbFactor(gtsam::NonlinearFactor::shared_ptr factor, std::string tag, double std,
-                                                 boost::optional<std::default_random_engine> generator) {
+                                                 boost::optional<std::default_random_engine> generator,
+                                                const boost::optional<jrl::Parser> parser,
+                                                const boost::optional<jrl::Writer> writer) {
   // Get helpers
   auto measurement_serializer = jrl::Writer().getDefaultMeasurementSerializer();
   auto value_serializer = jrl::Writer().getDefaultValueSerializer();
   auto measurement_parser = jrl::Parser().getDefaultMeasurementParsers();
   auto value_parser = jrl::Parser().getDefaultValueAccumulators();
+
+  if(writer){
+    measurement_serializer = writer->getDefaultMeasurementSerializer();
+    value_serializer = writer->getDefaultValueSerializer();
+  }
+  if(parser){
+    measurement_parser = parser->getDefaultMeasurementParsers();
+    value_parser = parser->getDefaultValueAccumulators();
+  }
+
   if (!generator.is_initialized()) {
     generator = std::default_random_engine();
   }

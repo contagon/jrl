@@ -80,7 +80,7 @@ inline std::pair<double, double> squaredPoseError<gtsam::Pose2>(gtsam::Pose2 est
  * @returns Pair containing (ATE Translation, ATE Rotation) or boost::none if the dataset does not contain ground truth
  */
 template <class POSE_TYPE>
-inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset dataset, Results results,
+inline boost::optional<std::pair<double, double>> computeATE(char rid, const Dataset& dataset, const Results& results,
                                                              bool align = true, bool align_with_scale = false);
 
 /** @brief Computes the SVE for the dataset

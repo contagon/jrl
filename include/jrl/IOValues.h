@@ -27,13 +27,13 @@ static const std::string StereoPoint2Tag = "StereoPoint2";
 namespace io_values {
 
 template <typename VALUE>
-void valueAccumulator(std::function<VALUE(json)> parser, json input_json, gtsam::Key key, gtsam::Values& accum) {
+void valueAccumulator(std::function<VALUE(const json&)> parser, const json& input_json, gtsam::Key key, gtsam::Values& accum) {
   accum.insert(key, parser(input_json));
 }
 
 /**********************************************************************************************************************/
 template <typename T>
-T parse(json input_json) {  // Base Parse function for builtins. Specialization provided for all iovalues
+T parse(const json& input_json) {  // Base Parse function for builtins. Specialization provided for all iovalues
   return input_json["value"].get<T>();
 }
 
@@ -48,70 +48,70 @@ json serialize(T obj) {  // Base Parse function for builtins. Specialization pro
 /**********************************************************************************************************************/
 // Rot2
 template <>
-gtsam::Rot2 parse<gtsam::Rot2>(json input_json);
+gtsam::Rot2 parse<gtsam::Rot2>(const json& input_json);
 template <>
 json serialize<gtsam::Rot2>(gtsam::Rot2 pose);
 
 /**********************************************************************************************************************/
 // POSE2
 template <>
-gtsam::Pose2 parse<gtsam::Pose2>(json input_json);
+gtsam::Pose2 parse<gtsam::Pose2>(const json& input_json);
 template <>
 json serialize<gtsam::Pose2>(gtsam::Pose2 pose);
 
 /**********************************************************************************************************************/
 // Rot3
 template <>
-gtsam::Rot3 parse<gtsam::Rot3>(json input_json);
+gtsam::Rot3 parse<gtsam::Rot3>(const json& input_json);
 template <>
 json serialize<gtsam::Rot3>(gtsam::Rot3 pose);
 
 /**********************************************************************************************************************/
 // POSE3
 template <>
-gtsam::Pose3 parse<gtsam::Pose3>(json input_json);
+gtsam::Pose3 parse<gtsam::Pose3>(const json& input_json);
 template <>
 json serialize<gtsam::Pose3>(gtsam::Pose3 pose);
 
 /**********************************************************************************************************************/
 // VECTOR
 template <>
-gtsam::Vector parse<gtsam::Vector>(json input_json);
+gtsam::Vector parse<gtsam::Vector>(const json& input_json);
 template <>
 json serialize<gtsam::Vector>(gtsam::Vector vec);
 
 /**********************************************************************************************************************/
 // Point2
 template <>
-gtsam::Point2 parse<gtsam::Point2>(json input_json);
+gtsam::Point2 parse<gtsam::Point2>(const json& input_json);
 template <>
 json serialize<gtsam::Point2>(gtsam::Point2 point);
 
 /**********************************************************************************************************************/
 // Point3
 template <>
-gtsam::Point3 parse<gtsam::Point3>(json input_json);
+gtsam::Point3 parse<gtsam::Point3>(const json& input_json);
 template <>
 json serialize<gtsam::Point3>(gtsam::Point3 point);
 
 /**********************************************************************************************************************/
 // Unit3
 template <>
-gtsam::Unit3 parse<gtsam::Unit3>(json input_json);
+gtsam::Unit3 parse<gtsam::Unit3>(const json& input_json);
 template <>
 json serialize<gtsam::Unit3>(gtsam::Unit3 point);
 
 /**********************************************************************************************************************/
 // ConstantBias
 template <>
-gtsam::imuBias::ConstantBias parse<gtsam::imuBias::ConstantBias>(json input_json);
+gtsam::imuBias::ConstantBias parse<gtsam::imuBias::ConstantBias>(const json& input_json);
 template <>
 json serialize<gtsam::imuBias::ConstantBias>(gtsam::imuBias::ConstantBias point);
 
 /**********************************************************************************************************************/
 // ConstantBias
 template <>
-gtsam::StereoPoint2 parse<gtsam::StereoPoint2>(json input_json);
+gtsam::StereoPoint2 parse<gtsam::StereoPoint2>(const json& input_json);
 template <>
 json serialize<gtsam::StereoPoint2>(gtsam::StereoPoint2 point);
 
@@ -119,7 +119,7 @@ json serialize<gtsam::StereoPoint2>(gtsam::StereoPoint2 point);
 // BearingRange Need special treatment because c++ does not allow function partial specialization
 template <typename A1, typename A2, typename B = typename gtsam::Bearing<A1, A2>::result_type,
           typename R = typename gtsam::Range<A1, A2>::result_type>
-gtsam::BearingRange<A1, A2> parseBearingRange(json input_json) {
+gtsam::BearingRange<A1, A2> parseBearingRange(const json& input_json) {
   B bearing = parse<B>(input_json["bearing"]);
   R range = parse<R>(input_json["range"]);
   return gtsam::BearingRange<A1, A2>(bearing, range);

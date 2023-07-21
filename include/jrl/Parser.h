@@ -11,9 +11,9 @@ using json = nlohmann::json;
 namespace jrl {
 
 /// @brief Parses the value at key from given json and adds to the provided values
-typedef std::function<void(json, gtsam::Key& key, gtsam::Values&)> ValueParser;
+typedef std::function<void(const json&, gtsam::Key& key, gtsam::Values&)> ValueParser;
 /// @brief Parses the given json into a factor
-typedef std::function<gtsam::NonlinearFactor::shared_ptr(json)> MeasurementParser;
+typedef std::function<gtsam::NonlinearFactor::shared_ptr(const json&)> MeasurementParser;
 
 class Parser {
   /** Members **/
@@ -34,13 +34,13 @@ class Parser {
    *  @param values_json Input JSON containing the serialized values
    *  @return Parsed Values as GTSAM types
    **/
-  TypedValues parseValues(json values_json);
+  TypedValues parseValues(const json& values_json);
 
   /** @brief Parses all measurements using the loaded measurement parsers
    *  @param measurements_json Input JSON containing the serialized measurement entries
    *  @return Parsed measurement entries
    **/
-  std::vector<Entry> parseMeasurements(json measurements_json);
+  std::vector<Entry> parseMeasurements(const json& measurements_json);
 
   /** @brief Reads arbitrary JSON from file
    * @param input_file_name: The file from which to read the json
@@ -54,10 +54,10 @@ class Parser {
   Parser();
 
   /// @brief Get the default value serializer
-  std::map<std::string, ValueParser> getDefaultValueAccumulators() { return value_accumulators_; };
+  std::map<std::string, ValueParser> getDefaultValueAccumulators() const { return value_accumulators_; };
 
   /// @brief Get the default measurement serializer
-  std::map<std::string, MeasurementParser> getDefaultMeasurementParsers() { return measurement_parsers_; };
+  std::map<std::string, MeasurementParser> getDefaultMeasurementParsers() const { return measurement_parsers_; };
 
   /// @brief Loads and parses a JRL file into a Dataset
   /// @param decompress_from_cbor if true indicates that input files are compressed with cbor and must be decompressed

@@ -35,7 +35,7 @@ TEST(Custom, Factor){
     writer.registerMeasurementSerializer(customType, [customType](gtsam::NonlinearFactor::shared_ptr& factor) { return jrl::io_measurements::serializePrior<gtsam::Pose2>(&jrl::io_values::serialize<gtsam::Pose2>, customType, factor); });
 
     jrl::Parser parser;
-    parser.registerMeasurementParser(customType, [](json input){ return jrl::io_measurements::parsePrior<gtsam::Pose2>(&jrl::io_values::parse<gtsam::Pose2>, input); });
+    parser.registerMeasurementParser(customType, [](const json& input){ return jrl::io_measurements::parsePrior<gtsam::Pose2>(&jrl::io_values::parse<gtsam::Pose2>, input); });
 
     // Send it round trip!
     writer.writeDataset(builder.build(), "custom.jrl");
@@ -67,7 +67,7 @@ TEST(Custom, Value){
     writer.registerValueSerializer(customType, [customType](gtsam::Key key, gtsam::Values& vals) { return jrl::io_values::serialize<gtsam::Pose2>(vals.at<gtsam::Pose2>(key)); });
 
     jrl::Parser parser;
-    parser.registerValueParser(customType, [](json input, gtsam::Key key, gtsam::Values& accum) { return jrl::io_values::valueAccumulator<gtsam::Pose2>(&jrl::io_values::parse<gtsam::Pose2>, input, key, accum); });
+    parser.registerValueParser(customType, [](const json& input, gtsam::Key key, gtsam::Values& accum) { return jrl::io_values::valueAccumulator<gtsam::Pose2>(&jrl::io_values::parse<gtsam::Pose2>, input, key, accum); });
 
     // Send it round trip!
     writer.writeDataset(builder.build(), "custom.jrl");

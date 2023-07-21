@@ -56,10 +56,10 @@ class Writer {
   Writer();
 
   /// @brief Get the default value serializer
-  std::map<std::string, ValueSerializer> getDefaultValueSerializer() { return value_serializers_; };
+  std::map<std::string, ValueSerializer> getDefaultValueSerializer() const { return value_serializers_; };
 
   /// @brief Get the default measurement serializer
-  std::map<std::string, MeasurementSerializer> getDefaultMeasurementSerializer() { return measurement_serializers_; };
+  std::map<std::string, MeasurementSerializer> getDefaultMeasurementSerializer() const { return measurement_serializers_; };
 
   /// @brief Serializes dataset and writes to file
   /// @param compress_with_cbor if true indicates that written files should be compressed with cbor

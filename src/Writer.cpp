@@ -84,7 +84,8 @@ json Writer::serializeMeasurements(std::vector<Entry> entries) {
     json entry_obj;
     entry_obj["stamp"] = entry.stamp;
     entry_obj["is_outlier"] = entry.is_outlier;
-    for (int i = 0; i < entry.measurements.nrFactors(); i++) {
+    size_t numFactors = entry.measurements.nrFactors();
+    for (int i = 0; i < numFactors; i++) {
       std::string measurement_type = entry.measurement_types[i];
       gtsam::NonlinearFactor::shared_ptr factor = entry.measurements.at(i);
       entry_obj["measurements"].push_back(measurement_serializers_[measurement_type](factor));

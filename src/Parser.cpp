@@ -24,14 +24,14 @@ Parser::Parser() {
 std::map<std::string, ValueParser> Parser::loadDefaultValueAccumulators() {
   // clang-format off
   std::map<std::string, ValueParser> parser_functions = {
-      {Pose2Tag,        [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Pose2>(&parse<gtsam::Pose2>, input, key, accum); }},
-      {Pose3Tag,        [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Pose3>(&parse<gtsam::Pose3>, input, key, accum); }},
-      {Point2Tag,       [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Point2>(&parse<gtsam::Point2>, input, key, accum); }},
-      {Point3Tag,       [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Point3>(&parse<gtsam::Point3>, input, key, accum); }},
-      {VectorTag,       [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Vector>(&parse<gtsam::Vector>, input, key, accum); }},
-      {ScalarTag,       [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<double>(&parse<double>, input, key, accum); }},
-      {IMUBiasTag,      [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::imuBias::ConstantBias>(&parse<gtsam::imuBias::ConstantBias>, input, key, accum); }},
-      {StereoPoint2Tag, [](json input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::StereoPoint2>(&parse<gtsam::StereoPoint2>, input, key, accum); }},
+      {Pose2Tag,        [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Pose2>(&parse<gtsam::Pose2>, input, key, accum); }},
+      {Pose3Tag,        [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Pose3>(&parse<gtsam::Pose3>, input, key, accum); }},
+      {Point2Tag,       [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Point2>(&parse<gtsam::Point2>, input, key, accum); }},
+      {Point3Tag,       [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Point3>(&parse<gtsam::Point3>, input, key, accum); }},
+      {VectorTag,       [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::Vector>(&parse<gtsam::Vector>, input, key, accum); }},
+      {ScalarTag,       [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<double>(&parse<double>, input, key, accum); }},
+      {IMUBiasTag,      [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::imuBias::ConstantBias>(&parse<gtsam::imuBias::ConstantBias>, input, key, accum); }},
+      {StereoPoint2Tag, [](const json& input, gtsam::Key key, gtsam::Values& accum) { return valueAccumulator<gtsam::StereoPoint2>(&parse<gtsam::StereoPoint2>, input, key, accum); }},
   };
   // clang-format on
   return parser_functions;
@@ -41,28 +41,28 @@ std::map<std::string, ValueParser> Parser::loadDefaultValueAccumulators() {
 std::map<std::string, MeasurementParser> Parser::loadDefaultMeasurementParsers() {
   // clang-format off
   std::map<std::string, MeasurementParser> parser_functions = {
-      {PriorFactorPose2Tag,         [](json input) { return parsePrior<gtsam::Pose2>(&parse<gtsam::Pose2>, input); }},
-      {PriorFactorPose3Tag,         [](json input) { return parsePrior<gtsam::Pose3>(&parse<gtsam::Pose3>, input); }},
-      {BetweenFactorPose2Tag,       [](json input) { return parseNoiseModel2<gtsam::Pose2, gtsam::BetweenFactor<gtsam::Pose2>>(&parse<gtsam::Pose2>, input); }},
-      {BetweenFactorPose3Tag,       [](json input) { return parseNoiseModel2<gtsam::Pose3, gtsam::BetweenFactor<gtsam::Pose3>>(&parse<gtsam::Pose3>, input); }},
-      {RangeFactorPose2Tag,         [](json input) { return parseNoiseModel2<double, gtsam::RangeFactor<gtsam::Pose2>>(&parse<double>, input); }},
-      {RangeFactorPose3Tag,         [](json input) { return parseNoiseModel2<double, gtsam::RangeFactor<gtsam::Pose3>>(&parse<double>, input); }},
-      {BearingRangeFactorPose2Tag,  [](json input) { return parseNoiseModel2<gtsam::BearingRange<gtsam::Pose2, gtsam::Pose2>, gtsam::BearingRangeFactor<gtsam::Pose2, gtsam::Pose2>>(&parseBearingRange<gtsam::Pose2, gtsam::Pose2>, input); }},
-      {BearingRangeFactorPose3Tag,  [](json input) { return parseNoiseModel2<gtsam::BearingRange<gtsam::Pose3, gtsam::Pose3>, gtsam::BearingRangeFactor<gtsam::Pose3, gtsam::Pose3>>(&parseBearingRange<gtsam::Pose3, gtsam::Pose3>, input); }},
-      {PriorFactorPoint2Tag,        [](json input) { return parsePrior<gtsam::Point2>(&parse<gtsam::Point2>, input); }},
-      {PriorFactorPoint3Tag,        [](json input) { return parsePrior<gtsam::Point3>(&parse<gtsam::Point3>, input); }},
-      {BetweenFactorPoint2Tag,      [](json input) { return parseNoiseModel2<gtsam::Point2, gtsam::BetweenFactor<gtsam::Point2>>(&parse<gtsam::Point2>, input); }},
-      {BetweenFactorPoint3Tag,      [](json input) { return parseNoiseModel2<gtsam::Point3, gtsam::BetweenFactor<gtsam::Point3>>(&parse<gtsam::Point3>, input); }},
-      {StereoFactorPose3Point3Tag,  [](json input) { return parseStereoFactor<gtsam::Pose3, gtsam::Point3>(&parse<gtsam::Pose3>, input); }},
-      {PriorFactorIMUBiasTag,       [](json input) { return parsePrior<gtsam::imuBias::ConstantBias>(&parse<gtsam::imuBias::ConstantBias>, input); }},
-      {CombinedIMUTag,              [](json input) { return parseCombinedIMUFactor(input); }},
+      {PriorFactorPose2Tag,         [](const json& input) { return parsePrior<gtsam::Pose2>(&parse<gtsam::Pose2>, input); }},
+      {PriorFactorPose3Tag,         [](const json& input) { return parsePrior<gtsam::Pose3>(&parse<gtsam::Pose3>, input); }},
+      {BetweenFactorPose2Tag,       [](const json& input) { return parseNoiseModel2<gtsam::Pose2, gtsam::BetweenFactor<gtsam::Pose2>>(&parse<gtsam::Pose2>, input); }},
+      {BetweenFactorPose3Tag,       [](const json& input) { return parseNoiseModel2<gtsam::Pose3, gtsam::BetweenFactor<gtsam::Pose3>>(&parse<gtsam::Pose3>, input); }},
+      {RangeFactorPose2Tag,         [](const json& input) { return parseNoiseModel2<double, gtsam::RangeFactor<gtsam::Pose2>>(&parse<double>, input); }},
+      {RangeFactorPose3Tag,         [](const json& input) { return parseNoiseModel2<double, gtsam::RangeFactor<gtsam::Pose3>>(&parse<double>, input); }},
+      {BearingRangeFactorPose2Tag,  [](const json& input) { return parseNoiseModel2<gtsam::BearingRange<gtsam::Pose2, gtsam::Pose2>, gtsam::BearingRangeFactor<gtsam::Pose2, gtsam::Pose2>>(&parseBearingRange<gtsam::Pose2, gtsam::Pose2>, input); }},
+      {BearingRangeFactorPose3Tag,  [](const json& input) { return parseNoiseModel2<gtsam::BearingRange<gtsam::Pose3, gtsam::Pose3>, gtsam::BearingRangeFactor<gtsam::Pose3, gtsam::Pose3>>(&parseBearingRange<gtsam::Pose3, gtsam::Pose3>, input); }},
+      {PriorFactorPoint2Tag,        [](const json& input) { return parsePrior<gtsam::Point2>(&parse<gtsam::Point2>, input); }},
+      {PriorFactorPoint3Tag,        [](const json& input) { return parsePrior<gtsam::Point3>(&parse<gtsam::Point3>, input); }},
+      {BetweenFactorPoint2Tag,      [](const json& input) { return parseNoiseModel2<gtsam::Point2, gtsam::BetweenFactor<gtsam::Point2>>(&parse<gtsam::Point2>, input); }},
+      {BetweenFactorPoint3Tag,      [](const json& input) { return parseNoiseModel2<gtsam::Point3, gtsam::BetweenFactor<gtsam::Point3>>(&parse<gtsam::Point3>, input); }},
+      {StereoFactorPose3Point3Tag,  [](const json& input) { return parseStereoFactor<gtsam::Pose3, gtsam::Point3>(&parse<gtsam::Pose3>, input); }},
+      {PriorFactorIMUBiasTag,       [](const json& input) { return parsePrior<gtsam::imuBias::ConstantBias>(&parse<gtsam::imuBias::ConstantBias>, input); }},
+      {CombinedIMUTag,              [](const json& input) { return parseCombinedIMUFactor(input); }},
   };
   // clang-format on
   return parser_functions;
 }
 
 /**********************************************************************************************************************/
-TypedValues Parser::parseValues(json values_json) {
+TypedValues Parser::parseValues(const json& values_json) {
   gtsam::Values values;
   ValueTypes value_types;
   for (auto& value_element : values_json) {
@@ -75,19 +75,21 @@ TypedValues Parser::parseValues(json values_json) {
 }
 
 /**********************************************************************************************************************/
-std::vector<Entry> Parser::parseMeasurements(json measurements_json) {
+std::vector<Entry> Parser::parseMeasurements(const json& measurements_json) {
   std::vector<Entry> measurements;
   for (auto& entry_element : measurements_json) {
     uint64_t stamp = entry_element["stamp"].get<uint64_t>();
     std::vector<bool> outliers = entry_element["is_outlier"];
     gtsam::NonlinearFactorGraph entry_measurements;
     std::vector<std::string> type_tags;
-    for (auto& measurement : entry_element["measurements"]) {
-      std::string tag = measurement["type"].get<std::string>();
-      type_tags.push_back(tag);
-      entry_measurements.push_back(measurement_parsers_[tag](measurement));
+    if(entry_element.contains("measurements")){
+      for (auto& measurement : entry_element["measurements"]) {
+        std::string tag = measurement["type"].get<std::string>();
+        type_tags.push_back(tag);
+        entry_measurements.push_back(measurement_parsers_[tag](measurement));
+      }
     }
-    measurements.push_back(Entry(stamp, type_tags, entry_measurements, outliers));
+    measurements.emplace_back(stamp, type_tags, entry_measurements, outliers);
   }
   return measurements;
 }

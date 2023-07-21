@@ -28,12 +28,12 @@ inline std::pair<double, double> squaredPoseError<gtsam::Pose2>(gtsam::Pose2 est
 
 /**********************************************************************************************************************/
 template <class POSE_TYPE>
-inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset dataset, Results results, bool align,
+inline boost::optional<std::pair<double, double>> computeATE(char rid, const Dataset& dataset, const Results& results, bool align,
                                                              bool align_with_scale) {
   // We have groundtruth so we can compute ATE
   if (dataset.containsGroundTruth()) {
-    gtsam::Values ref = dataset.groundTruth(rid).filter<POSE_TYPE>();
-    gtsam::Values est = results.robot_solutions[rid].values.filter<POSE_TYPE>();
+    gtsam::Values ref = dataset.groundTruth(rid);
+    gtsam::Values est = results.robot_solutions.at(rid).values.filter<POSE_TYPE>();
     if (align) {
       est = alignment::align<POSE_TYPE>(est, ref, align_with_scale);
     }
@@ -49,8 +49,8 @@ inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset d
     }
 
     // Return the RMSE of the pose errors
-    return std::make_pair(std::sqrt(squared_translation_error / ref.size()),
-                          std::sqrt(squared_rotation_error / ref.size()));
+    return std::make_pair(std::sqrt(squared_translation_error / est.size()),
+                          std::sqrt(squared_rotation_error / est.size()));
 
   }
   // No ground truth, cannot compute ATE

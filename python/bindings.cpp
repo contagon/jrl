@@ -1,6 +1,7 @@
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 #include "jrl/Dataset.h"
 #include "jrl/DatasetBuilder.h"
@@ -16,6 +17,8 @@
 namespace py = pybind11;
 using namespace jrl;
 
+PYBIND11_DECLARE_HOLDER_TYPE(TYPE_PLACEHOLDER_DONOTUSE, boost::shared_ptr<TYPE_PLACEHOLDER_DONOTUSE>);
+
 PYBIND11_MODULE(jrl_python, m) {
   // Import gtsam to ensure that python has access to return types
   py::module gtsam = py::module::import("gtsam");
@@ -30,6 +33,7 @@ PYBIND11_MODULE(jrl_python, m) {
   m.attr("VectorTag") = py::str(VectorTag);
   m.attr("ScalarTag") = py::str(ScalarTag);
   m.attr("BearingRangeTag") = py::str(BearingRangeTag);
+  m.attr("IMUBiasTag") = py::str(IMUBiasTag);
 
   m.attr("PriorFactorPose2Tag") = py::str(PriorFactorPose2Tag);
   m.attr("PriorFactorPose3Tag") = py::str(PriorFactorPose3Tag);
@@ -273,5 +277,8 @@ PYBIND11_MODULE(jrl_python, m) {
 
   // ------------------------- OUTLIERS ------------------------- //
   m.def("addOutliers", &addOutliers, py::return_value_policy::copy,
-      py::arg("dataset"), py::arg("percOutliers"), py::arg("outlierTypes"), py::arg("newName"), py::arg("std")=5);  
+      py::arg("dataset"), py::arg("percOutliers"), py::arg("outlierTypes")=py::none(), py::arg("newName")=py::none(), py::arg("std")=5, py::arg("parser")=py::none(), py::arg("writer")=py::none());
+
+  m.def("perturbFactor", &perturbFactor, py::return_value_policy::copy,
+    py::arg("factor"), py::arg("tag"), py::arg("std"), py::arg("generator")= py::none(), py::arg("parser")=py::none(), py::arg("writer")=py::none());
 }
