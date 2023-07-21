@@ -55,6 +55,12 @@ class Writer {
   /// @brief Constructors a writer object
   Writer();
 
+  /// @brief Get the default value serializer
+  std::map<std::string, ValueSerializer> getDefaultValueSerializer() const { return value_serializers_; };
+
+  /// @brief Get the default measurement serializer
+  std::map<std::string, MeasurementSerializer> getDefaultMeasurementSerializer() const { return measurement_serializers_; };
+
   /// @brief Serializes dataset and writes to file
   /// @param compress_with_cbor if true indicates that written files should be compressed with cbor
   void writeDataset(Dataset dataset, std::string output_file_name, bool compress_to_cbor = false);
@@ -68,8 +74,12 @@ class Writer {
   void writeMetricSummary(MetricSummary metric_summary, std::string output_file_name, bool compress_to_cbor = false);
 
   // TODO
-  // void registerValueSerializer(std::string tag, ValueSerializer serializer_fn);
-  // void registerMeasurementParser(std::string tag, MeasurementSerializer serializer_fn);
+  void registerValueSerializer(std::string tag, ValueSerializer serializer_fn) {
+    value_serializers_[tag] = serializer_fn;
+  };
+  void registerMeasurementSerializer(std::string tag, MeasurementSerializer serializer_fn) {
+    measurement_serializers_[tag] = serializer_fn;
+  };
 };
 
 }  // namespace jrl

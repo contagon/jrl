@@ -1,4 +1,5 @@
 #pragma once
+#include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
 
 namespace jrl {
@@ -17,8 +18,13 @@ struct Entry {
   uint64_t stamp;
   std::vector<std::string> measurement_types;
   gtsam::NonlinearFactorGraph measurements;
-  Entry(uint64_t stamp, std::vector<std::string> measurement_types, gtsam::NonlinearFactorGraph measurements)
-      : stamp(stamp), measurement_types(measurement_types), measurements(measurements) {}
+  Entry(uint64_t stamp, std::vector<std::string> measurement_types, gtsam::NonlinearFactorGraph measurements);
+
+  // Remove all factors of a certain type
+  Entry remove(std::vector<std::string> remove_types);
+
+  // Only include factors of a certain type
+  Entry filter(std::vector<std::string> filter_types);
 };
 
 }  // namespace jrl

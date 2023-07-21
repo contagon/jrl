@@ -1,6 +1,7 @@
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 #include "jrl/Dataset.h"
 #include "jrl/DatasetBuilder.h"
@@ -29,6 +30,7 @@ PYBIND11_MODULE(jrl_python, m) {
   m.attr("VectorTag") = py::str(VectorTag);
   m.attr("ScalarTag") = py::str(ScalarTag);
   m.attr("BearingRangeTag") = py::str(BearingRangeTag);
+  m.attr("IMUBiasTag") = py::str(IMUBiasTag);
 
   m.attr("PriorFactorPose2Tag") = py::str(PriorFactorPose2Tag);
   m.attr("PriorFactorPose3Tag") = py::str(PriorFactorPose3Tag);
@@ -39,7 +41,8 @@ PYBIND11_MODULE(jrl_python, m) {
   m.attr("BearingRangeFactorPose2Tag") = py::str(BearingRangeFactorPose2Tag);
   m.attr("BearingRangeFactorPose3Tag") = py::str(BearingRangeFactorPose3Tag);
   m.attr("PriorFactorPoint2Tag") = py::str(PriorFactorPoint2Tag);
-  m.attr("PriorFactorPointTag") = py::str(PriorFactorPoint3Tag);
+  m.attr("PriorFactorPoint3Tag") = py::str(PriorFactorPoint3Tag);
+  m.attr("PriorFactorIMUBiasTag") = py::str(PriorFactorIMUBiasTag);
   m.attr("BetweenFactorPoint2Tag") = py::str(BetweenFactorPoint2Tag);
   m.attr("BetweenFactorPoint3Tag") = py::str(BetweenFactorPoint3Tag);
   m.attr("StereoFactorPose3Point3Tag") = py::str(StereoFactorPose3Point3Tag);
@@ -60,6 +63,8 @@ PYBIND11_MODULE(jrl_python, m) {
       .def_readwrite("stamp", &Entry::stamp)
       .def_readwrite("measurement_types", &Entry::measurement_types)
       .def_readwrite("measurements", &Entry::measurements)
+      .def("remove", &Entry::remove)
+      .def("filter", &Entry::filter)
       .def(py::pickle(
           [](const Entry &entry) {  // __getstate__
             return py::make_tuple(entry.stamp, entry.measurement_types, entry.measurements);
@@ -91,8 +96,10 @@ PYBIND11_MODULE(jrl_python, m) {
       .def("name", &Dataset::name)
       .def("robots", &Dataset::robots)
       .def("groundTruth", &Dataset::groundTruth)
+      .def("groundTruthWithTypes", &Dataset::groundTruthWithTypes)
       .def("containsGroundTruth", &Dataset::containsGroundTruth)
       .def("initialization", &Dataset::initialization)
+      .def("initializationWithTypes", &Dataset::initializationWithTypes)
       .def("containsInitialization", &Dataset::containsInitialization)
       .def("measurements", &Dataset::measurements)
       .def(py::pickle(
@@ -130,6 +137,8 @@ PYBIND11_MODULE(jrl_python, m) {
       .def(py::init<const std::string &, std::vector<char> &>())
       .def("addEntry", &DatasetBuilder::addEntry, py::arg("robot"), py::arg("stamp"), py::arg("measurements"),
            py::arg("measurement_types"), py::arg("initialization") = py::none(), py::arg("groundtruth") = py::none())
+      .def("addGroundTruth", &DatasetBuilder::addGroundTruth, py::arg("robot"), py::arg("groundtruth"))
+      .def("addInitialization", &DatasetBuilder::addInitialization, py::arg("robot"), py::arg("initialization"))
       .def("build", &DatasetBuilder::build);
 
   /**
@@ -226,11 +235,11 @@ PYBIND11_MODULE(jrl_python, m) {
 
   /**********************************************************************************************************************/
   m.def("computeATEPoint2", &metrics::computeATE<gtsam::Point2>, py::return_value_policy::copy, py::arg("rid"),
-        py::arg("dataset"), py::arg("results"), py::arg("align_with_scale") = false);
+        py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
   m.def("computeATEPoint3", &metrics::computeATE<gtsam::Point3>, py::return_value_policy::copy, py::arg("rid"),
-        py::arg("dataset"), py::arg("results"), py::arg("align_with_scale") = false);
+        py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
   m.def("computeATEPose2", &metrics::computeATE<gtsam::Pose2>, py::return_value_policy::copy, py::arg("rid"),
-        py::arg("dataset"), py::arg("results"), py::arg("align_with_scale") = false);
+        py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
   m.def("computeATEPose3", &metrics::computeATE<gtsam::Pose3>, py::return_value_policy::copy, py::arg("rid"),
-        py::arg("dataset"), py::arg("results"), py::arg("align_with_scale") = false);
+        py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
 }

@@ -26,12 +26,12 @@ void DatasetBuilder::addEntry(char robot, uint64_t stamp, gtsam::NonlinearFactor
   }
 }
 
-void DatasetBuilder::addGroundTruth(char robot, TypedValues groundtruth){
+void DatasetBuilder::addGroundTruth(char robot, TypedValues groundtruth) {
   ground_truth_[robot].values.insert(groundtruth.values);
   ground_truth_[robot].types.insert(groundtruth.types.begin(), groundtruth.types.end());
 }
 
-void DatasetBuilder::addInitialization(char robot, TypedValues initialization){
+void DatasetBuilder::addInitialization(char robot, TypedValues initialization) {
   initial_estimates_[robot].values.insert(initialization.values);
   initial_estimates_[robot].types.insert(initialization.types.begin(), initialization.types.end());
 }

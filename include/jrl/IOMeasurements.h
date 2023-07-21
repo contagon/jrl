@@ -4,11 +4,10 @@
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/navigation/CombinedImuFactor.h>
 #include <gtsam/nonlinear/PriorFactor.h>
+#include <gtsam/sam/BearingRangeFactor.h>
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/StereoFactor.h>
 #include <jrl/IOValues.h>
-#include <gtsam/sam/BearingRangeFactor.h>
-#include <gtsam/slam/BetweenFactor.h>
 
 #include <nlohmann/json.hpp>
 
@@ -41,9 +40,6 @@ json serializeMatrix(gtsam::Matrix mat);
 gtsam::Matrix parseCovariance(json input_json, int d);
 json serializeCovariance(gtsam::Matrix covariance);
 
-gtsam::Cal3_S2Stereo::shared_ptr parseCal3_S2Stereo(json input_json);
-json serializeCal3_S2Stereo(gtsam::Cal3_S2Stereo::shared_ptr calibration);
-
 gtsam::NonlinearFactor::shared_ptr parseCombinedIMUFactor(json input_json);
 json serializeCombinedIMUFactor(std::string type_tag, gtsam::NonlinearFactor::shared_ptr& factor);
 
@@ -52,7 +48,7 @@ template <typename T>
 gtsam::NonlinearFactor::shared_ptr parsePrior(std::function<T(json)> val_parser_fn, json input_json) {
   // Get all required fields
   json key_json = input_json["key"];
-  json measurement_json = input_json["prior"];
+  json measurement_json = input_json["measurement"];
   json covariance_json = input_json["covariance"];
 
   // Construct the factor
@@ -74,7 +70,7 @@ json serializePrior(std::function<json(T)> val_serializer_fn, std::string type_t
 
   output["type"] = type_tag;
   output["key"] = prior->key();
-  output["prior"] = val_serializer_fn(prior->prior());
+  output["measurement"] = val_serializer_fn(prior->prior());
 
   output["covariance"] = serializeCovariance(noise_model->covariance());
   return output;
@@ -131,7 +127,9 @@ gtsam::NonlinearFactor::shared_ptr parseStereoFactor(std::function<POSE(json)> p
 
   // Construct the factor
   gtsam::StereoPoint2 measured = io_values::parse<gtsam::StereoPoint2>(measurement_json);
-  gtsam::Cal3_S2Stereo::shared_ptr calibration = parseCal3_S2Stereo(calibration_json);
+  gtsam::Vector calibration_vector = parseMatrix(calibration_json, 6, 1);
+  gtsam::Cal3_S2Stereo::shared_ptr calibration = boost::make_shared<gtsam::Cal3_S2Stereo>(calibration_vector);
+
   typename gtsam::GenericStereoFactor<POSE, LANDMARK>::shared_ptr factor =
       boost::make_shared<gtsam::GenericStereoFactor<gtsam::Pose3, gtsam::Point3>>(
           measured, gtsam::noiseModel::Gaussian::Covariance(parseCovariance(covariance_json, 3)),
@@ -157,7 +155,7 @@ json serializeStereoFactor(std::function<json(POSE)> pose_serializer_fn, std::st
   output["measurement"] = io_values::serialize<gtsam::StereoPoint2>(stereo_factor->measured());
 
   // Extra stuff for this factor
-  output["calibration"] = serializeCal3_S2Stereo(stereo_factor->calibration());
+  output["calibration"] = serializeMatrix(stereo_factor->calibration()->vector());
   boost::optional<POSE> body_T_sensor = stereo_factor->body_P_sensor();
   if (body_T_sensor.is_initialized()) {
     output["body_T_sensor"] = pose_serializer_fn(body_T_sensor.get());

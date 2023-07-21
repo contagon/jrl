@@ -5,6 +5,7 @@
 #include <gtsam/inference/Symbol.h>
 #include <gtsam/nonlinear/Values.h>
 
+#include <boost/math/distributions/chi_squared.hpp>
 #include <vector>
 
 #include "jrl/Dataset.h"
@@ -62,8 +63,8 @@ inline std::pair<double, double> squaredPoseError<gtsam::Pose2>(gtsam::Pose2 est
  * @returns Pair containing (ATE Translation, ATE Rotation) or boost::none if the dataset does not contain ground truth
  */
 template <class POSE_TYPE>
-inline boost::optional<std::pair<double, double>> computeATE(char rid, Dataset dataset, Results results,
-                                                             bool align_with_scale = false);
+inline boost::optional<std::pair<double, double>> computeATE(char rid, const Dataset& dataset, const Results& results,
+                                                             bool align = true, bool align_with_scale = false);
 
 /** @brief Computes the SVE for the dataset
  * SVE is defined as the mean error between all combination of shared variable estimates

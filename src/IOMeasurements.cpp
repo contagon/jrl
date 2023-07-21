@@ -24,30 +24,6 @@ gtsam::Matrix parseCovariance(json input_json, int d) { return parseMatrix(input
 json serializeCovariance(gtsam::Matrix covariance) { return serializeMatrix(covariance); }
 
 /**********************************************************************************************************************/
-// Cal3_S2Stereo
-gtsam::Cal3_S2Stereo::shared_ptr parseCal3_S2Stereo(json input_json) {
-  double fx = input_json["fx"].get<double>();
-  double fy = input_json["fy"].get<double>();
-  double skew = input_json["skew"].get<double>();
-  double px = input_json["px"].get<double>();
-  double py = input_json["py"].get<double>();
-  double baseline = input_json["baseline"].get<double>();
-  return boost::make_shared<gtsam::Cal3_S2Stereo>(fx, fy, skew, px, py, baseline);
-}
-
-json serializeCal3_S2Stereo(gtsam::Cal3_S2Stereo::shared_ptr calibration) {
-  json output;
-  output["fx"] = calibration->fx();
-  output["fy"] = calibration->fy();
-  output["skew"] = calibration->skew();
-  output["px"] = calibration->px();
-  output["py"] = calibration->py();
-  output["baseline"] = calibration->baseline();
-  return output;
-}
-
-
-/**********************************************************************************************************************/
 // IMUFactor
 gtsam::NonlinearFactor::shared_ptr parseCombinedIMUFactor(json input_json) {
   // First construct Params
@@ -61,7 +37,7 @@ gtsam::NonlinearFactor::shared_ptr parseCombinedIMUFactor(json input_json) {
   params->n_gravity = io_values::parse<gtsam::Vector>(input_json["g"]);
 
   // Then construct TangentPreintegration
-  gtsam::Vector deltaXij = io_values::parse<gtsam::Vector>(input_json["deltaXij"]);
+  gtsam::Vector deltaXij = io_values::parse<gtsam::Vector>(input_json["measurement"]);
   gtsam::Matrix H_biassAcc = parseMatrix(input_json["H_biasAcc"], 9, 3);
   gtsam::Matrix H_biassOmega = parseMatrix(input_json["H_biasOmega"], 9, 3);
   double deltaTij = io_values::parse<double>(input_json["deltaTij"]);
@@ -97,7 +73,7 @@ json serializeCombinedIMUFactor(std::string type_tag, gtsam::NonlinearFactor::sh
     output["key" + std::to_string(i)] = imu_factor->keys()[i];
   }
   output["covariance"] = serializeCovariance(noise_model->covariance());
-  output["deltaXij"] = io_values::serialize<gtsam::Vector>(pim.preintegrated());
+  output["measurement"] = io_values::serialize<gtsam::Vector>(pim.preintegrated());
   output["H_biasAcc"] = serializeMatrix(pim.preintegrated_H_biasAcc());
   output["H_biasOmega"] = serializeMatrix(pim.preintegrated_H_biasOmega());
   output["deltaTij"] = io_values::serialize(pim.deltaTij());
