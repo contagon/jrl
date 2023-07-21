@@ -33,31 +33,37 @@ inline boost::optional<std::pair<double, double>> computeATE(char rid, const Dat
   // We have groundtruth so we can compute ATE
   if (dataset.containsGroundTruth()) {
     gtsam::Values ref = dataset.groundTruth(rid);
-    gtsam::Values est = results.robot_solutions.at(rid).values.filter<POSE_TYPE>();
-    if (align) {
-      est = alignment::align<POSE_TYPE>(est, ref, align_with_scale);
-    }
-
-    double squared_translation_error = 0.0;
-    double squared_rotation_error = 0.0;
-    for (auto& key : est.keys()) {
-      std::pair<double, double> squared_pose_error =
-          internal::squaredPoseError<POSE_TYPE>(est.at<POSE_TYPE>(key), ref.at<POSE_TYPE>(key));
-
-      squared_translation_error += squared_pose_error.first;
-      squared_rotation_error += squared_pose_error.second;
-    }
-
-    // Return the RMSE of the pose errors
-    return std::make_pair(std::sqrt(squared_translation_error / est.size()),
-                          std::sqrt(squared_rotation_error / est.size()));
-
+    gtsam::Values est = results.robot_solutions.at(rid).values;
+    return computeATE<POSE_TYPE>(ref, est, align, align_with_scale);
   }
   // No ground truth, cannot compute ATE
   else {
     return boost::none;
   }
 }
+
+template <class POSE_TYPE>
+inline std::pair<double, double> computeATE(gtsam::Values ref, gtsam::Values est, bool align, bool align_with_scale){
+  est = est.filter<POSE_TYPE>();
+  if (align) {
+    est = alignment::align<POSE_TYPE>(est, ref, align_with_scale);
+  }
+
+  double squared_translation_error = 0.0;
+  double squared_rotation_error = 0.0;
+  for (auto& key : est.keys()) {
+    std::pair<double, double> squared_pose_error =
+        internal::squaredPoseError<POSE_TYPE>(est.at<POSE_TYPE>(key), ref.at<POSE_TYPE>(key));
+
+    squared_translation_error += squared_pose_error.first;
+    squared_rotation_error += squared_pose_error.second;
+  }
+
+  // Return the RMSE of the pose errors
+  return std::make_pair(std::sqrt(squared_translation_error / est.size()),
+                        std::sqrt(squared_rotation_error / est.size()));
+}
+
 
 /**********************************************************************************************************************/
 template <class POSE_TYPE>

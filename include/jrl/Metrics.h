@@ -65,6 +65,9 @@ inline std::pair<double, double> squaredPoseError<gtsam::Pose2>(gtsam::Pose2 est
 template <class POSE_TYPE>
 inline boost::optional<std::pair<double, double>> computeATE(char rid, const Dataset& dataset, const Results& results,
                                                              bool align = true, bool align_with_scale = false);
+template <class POSE_TYPE>
+inline std::pair<double, double> computeATE(gtsam::Values ref, gtsam::Values est,
+                                                             bool align = true, bool align_with_scale = false);
 
 /** @brief Computes the SVE for the dataset
  * SVE is defined as the mean error between all combination of shared variable estimates

@@ -11,6 +11,7 @@
 #include "jrl/Parser.h"
 #include "jrl/Results.h"
 #include "jrl/Writer.h"
+#include "jrl/Alignment.h"
 #include "typecasters.h"
 
 namespace py = pybind11;
@@ -234,12 +235,30 @@ PYBIND11_MODULE(jrl_python, m) {
   m.def("computeSVEPose3", &metrics::computeSVE<gtsam::Pose3>, py::return_value_policy::copy, py::arg("results"));
 
   /**********************************************************************************************************************/
-  m.def("computeATEPoint2", &metrics::computeATE<gtsam::Point2>, py::return_value_policy::copy, py::arg("rid"),
+  m.def("computeATEPoint2", py::overload_cast<char, const Dataset&, const Results&, bool, bool>(&metrics::computeATE<gtsam::Point2>), py::return_value_policy::copy, py::arg("rid"),
         py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
-  m.def("computeATEPoint3", &metrics::computeATE<gtsam::Point3>, py::return_value_policy::copy, py::arg("rid"),
+  m.def("computeATEPoint3", py::overload_cast<char, const Dataset&, const Results&, bool, bool>(&metrics::computeATE<gtsam::Point3>), py::return_value_policy::copy, py::arg("rid"),
         py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
-  m.def("computeATEPose2", &metrics::computeATE<gtsam::Pose2>, py::return_value_policy::copy, py::arg("rid"),
+  m.def("computeATEPose2", py::overload_cast<char, const Dataset&, const Results&, bool, bool>(&metrics::computeATE<gtsam::Pose2>), py::return_value_policy::copy, py::arg("rid"),
         py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
-  m.def("computeATEPose3", &metrics::computeATE<gtsam::Pose3>, py::return_value_policy::copy, py::arg("rid"),
+  m.def("computeATEPose3", py::overload_cast<char, const Dataset&, const Results&, bool, bool>(&metrics::computeATE<gtsam::Pose3>), py::return_value_policy::copy, py::arg("rid"),
         py::arg("dataset"), py::arg("results"), py::arg("align") = true, py::arg("align_with_scale") = false);
+
+  m.def("computeATEPoint2", py::overload_cast<gtsam::Values, gtsam::Values, bool, bool>(&metrics::computeATE<gtsam::Point2>), py::return_value_policy::copy,
+        py::arg("ref"), py::arg("est"), py::arg("align") = true, py::arg("align_with_scale") = false);
+  m.def("computeATEPoint3", py::overload_cast<gtsam::Values, gtsam::Values, bool, bool>(&metrics::computeATE<gtsam::Point3>), py::return_value_policy::copy,
+        py::arg("ref"), py::arg("est"), py::arg("align") = true, py::arg("align_with_scale") = false);
+  m.def("computeATEPose2", py::overload_cast<gtsam::Values, gtsam::Values, bool, bool>(&metrics::computeATE<gtsam::Pose2>), py::return_value_policy::copy,
+        py::arg("ref"), py::arg("est"), py::arg("align") = true, py::arg("align_with_scale") = false);
+  m.def("computeATEPose3", py::overload_cast<gtsam::Values, gtsam::Values, bool, bool>(&metrics::computeATE<gtsam::Pose3>), py::return_value_policy::copy,
+        py::arg("ref"), py::arg("est"), py::arg("align") = true, py::arg("align_with_scale") = false);
+
+  m.def("alignPoint2", &jrl::alignment::align<gtsam::Point2>, py::return_value_policy::copy, 
+        py::arg("est"), py::arg("ref"), py::arg("align_with_scale"));
+  m.def("alignPoint3", &jrl::alignment::align<gtsam::Point3>, py::return_value_policy::copy, 
+        py::arg("est"), py::arg("ref"), py::arg("align_with_scale"));
+  m.def("alignPose2", &jrl::alignment::align<gtsam::Pose2>, py::return_value_policy::copy, 
+        py::arg("est"), py::arg("ref"), py::arg("align_with_scale"));
+  m.def("alignPose3", &jrl::alignment::align<gtsam::Pose3>, py::return_value_policy::copy, 
+        py::arg("est"), py::arg("ref"), py::arg("align_with_scale"));
 }
