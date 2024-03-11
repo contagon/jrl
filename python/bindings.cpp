@@ -96,6 +96,7 @@ PYBIND11_MODULE(jrl_python, m) {
                     boost::optional<std::map<char, TypedValues>> &, boost::optional<std::map<char, TypedValues>> &>())
       .def("name", &Dataset::name)
       .def("robots", &Dataset::robots)
+      .def("factorGraph", &Dataset::factorGraph)
       .def("groundTruth", &Dataset::groundTruth)
       .def("groundTruthWithTypes", &Dataset::groundTruthWithTypes)
       .def("containsGroundTruth", &Dataset::containsGroundTruth)

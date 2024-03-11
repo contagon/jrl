@@ -58,10 +58,10 @@ template <class POSE_TYPE>
 inline gtsam::Values align(const gtsam::Values& estimate_trajectory, const gtsam::Values& reference_trajectory,
                            bool align_with_scale) {
   // High level information
-  gtsam::KeyVector keys = reference_trajectory.keys();
-  POSE_TYPE sample_obj = reference_trajectory.at<POSE_TYPE>(keys.front());
+  gtsam::KeyVector keys = estimate_trajectory.keys();
+  POSE_TYPE sample_obj = estimate_trajectory.at<POSE_TYPE>(keys.front());
   size_t d = internal::translationDimension<POSE_TYPE>(sample_obj);
-  size_t nposes = reference_trajectory.size();
+  size_t nposes = estimate_trajectory.size();
 
   // Construct d dimensional matrices of the translational components of all trajectory poses
   gtsam::Matrix ref_mat(nposes, d);

@@ -76,8 +76,15 @@ class Parser {
 
   // TODO
   void registerValueParser(std::string tag, ValueParser parser_fn) { value_accumulators_[tag] = parser_fn; };
+  void registerValueAlias(std::string alias, std::string tag) {
+    value_accumulators_[alias] = value_accumulators_[tag];
+  };
+
   void registerMeasurementParser(std::string tag, MeasurementParser parser_fn) {
     measurement_parsers_[tag] = parser_fn;
+  };
+  void registerMeasurementAlias(std::string alias, std::string tag) {
+    measurement_parsers_[alias] = measurement_parsers_[tag];
   };
 };
 
